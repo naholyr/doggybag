@@ -1,5 +1,7 @@
 # doggybag
 
+[![Build Status](https://secure.travis-ci.org/Dijiwan/doggybag.png?branch=master)](http://travis-ci.org/Dijiwan/doggybag)
+
 At [Dijiwan](http://dijiwan.com), we use JavaScript a lot, especially with *node.js*.
 We have common needs across our project, so we decided to package them, and
 make them available publicly.
