@@ -1,0 +1,21 @@
+{
+  "author": "Dijiwan (http://dijiwan.com)",
+  "name": "doggybag",
+  "description": "Stuff we share across our projects. It's like a toolbox but it smells good!",
+  "version": "1.0.0alpha",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/oncletom/doggybag.git"
+  },
+  "scripts": {
+    "test": "./node_modules/.bin/mocha -ui tdd"
+  },
+  "engines": {
+    "node": "~0.6.18"
+  },
+  "dependencies": {
+    "expect": "0.0.2",
+    "mocha": "~1.0.3"
+  },
+  "devDependencies": {}
+}
