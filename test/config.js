@@ -1,0 +1,3 @@
+suite('doggybag/config', function(){
+
+});
