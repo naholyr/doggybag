@@ -8,14 +8,15 @@
     "url": "git://github.com/oncletom/doggybag.git"
   },
   "scripts": {
-    "test": "./node_modules/.bin/mocha --ui tdd"
+    "test": "./node_modules/.bin/mocha --ui tdd --reporter list"
   },
   "engines": {
     "node": "~0.6.18"
   },
   "dependencies": {
-    "expect": "0.0.2",
-    "mocha": "~1.0.3"
+    "expect.js": "~0.1.2",
+    "mocha": "~1.0.3",
+    "nconf": "~0.5.1"
   },
   "devDependencies": {}
 }
