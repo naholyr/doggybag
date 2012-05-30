@@ -15,7 +15,8 @@ It's also a way to carry delicious stuff at home, or at work.
 
 ## Forms Extended
 
-Provides some utilities for [forms](), like Twitter Bootstrap templating and so on.
+Provides some utilities for [forms](https://github.com/caolan/forms),
+like Twitter Bootstrap templating and so on.
 
 ```javascript
 var formsExtended = require('doggybag/forms')
