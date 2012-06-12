@@ -95,7 +95,6 @@ module.exports = function (options, dependencies) {
 
     // Send data to job queue
     e.write = function write(data, suffix, done, writeQueue) {
-        console.error('write', data, suffix, done, writeQueue);
         onReady(function (exchange) {
             var route = writeQueue || options.writeQueue;
             if (suffix) route += '.' + suffix;
