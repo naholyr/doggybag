@@ -1,6 +1,7 @@
 "use strict";
 
 var winston = require('winston');
+var path = require('path');
 
 var Client = require('./AMQPJobResultClient');
 
@@ -164,7 +165,7 @@ module.exports = function (jobType, options, fn, dependencies) {
     // Get standard agent components
     var agentModule;
     try {
-        agentModule = options.module || require((options.modulePath || './') + jobType);
+        agentModule = options.module || require(path.join(options.modulePath || '.'), jobType);
     } catch (e) {
         return done(e, null);
     }
