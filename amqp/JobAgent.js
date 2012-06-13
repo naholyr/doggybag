@@ -193,13 +193,13 @@ module.exports = function (jobType, options, fn, dependencies) {
       try {
         agentModule.run(jobData, function (err, result) {
           if (err) {
-            respond({ "error":"JOB_FAILED", "data":err.stack || err.toString(), "originalResult":jobData }, err.reject ? err.requeue : null, err.reject && (err.requeueDelay || options.requeueDelay));
+            respond({ "error":"JOB_FAILED", "data":err.stack || err.toString(), "partialResult":result }, err.reject ? err.requeue : null, err.reject && (err.requeueDelay || options.requeueDelay));
           } else {
             respond({ "success":true, "data":result });
           }
         });
       } catch (e) {
-        respond({ "error":"RUN_UNCAUGHT_EXCEPTION", "data":e.stack || e.toString(), "originalResult":jobData });
+        respond({ "error":"RUN_UNCAUGHT_EXCEPTION", "data":e.stack || e.toString() });
       }
     });
   };
@@ -209,13 +209,13 @@ module.exports = function (jobType, options, fn, dependencies) {
     try {
       agentModule.validate(job.data, function (err, jobData) {
         if (err) {
-          respond({ "error":"INVALID_JOB", "data":err.stack || err.toString(), "originalResult":jobData });
+          respond({ "error":"INVALID_JOB", "data":err.stack || err.toString() });
         } else {
           onValidated(jobData, respond);
         }
       });
     } catch (e) {
-      respond({ "error":"VALIDATION_UNCAUGHT_EXCEPTION", "data":e.stack || e.toString(), "originalResult":jobData });
+      respond({ "error":"VALIDATION_UNCAUGHT_EXCEPTION", "data":e.stack || e.toString() });
     }
   };
 
