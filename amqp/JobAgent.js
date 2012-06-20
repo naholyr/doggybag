@@ -209,13 +209,13 @@ module.exports = function (jobType, options, fn, dependencies) {
     try {
       agentModule.validate(job.data, function (err, jobData) {
         if (err) {
-          respond({ "error":"INVALID_JOB", "data":err.stack || err.toString() });
+          respond({ "error":"INVALID_JOB", "data":err.stack || err.toString(), "originalJob": job });
         } else {
           onValidated(jobData, respond);
         }
       });
     } catch (e) {
-      respond({ "error":"VALIDATION_UNCAUGHT_EXCEPTION", "data":e.stack || e.toString() });
+      respond({ "error":"VALIDATION_UNCAUGHT_EXCEPTION", "data":e.stack || e.toString(), "originalJob": job });
     }
   };
 
