@@ -14,6 +14,9 @@ loggers.add = function add(names, config) {
   // Default config = embedded configuration handler using "logging" category
   if (!config || typeof config === 'string') {
     config = require('../config').stores[config || 'logging'];
+    if (!config) {
+      throw new Error('Configuration not found (' + config + ')');
+    }
   }
   // Retrieve a config part: supports hash or nconf-styled ".get"
   var getConfig = function (name) {
@@ -38,14 +41,22 @@ loggers.add = function add(names, config) {
     // Force array
     names = [names];
   }
-  // Reserved name
+  // require at least a name
+  if (!names.length) {
+    throw new Error('Empty list of loggers');
+  }
+  // reserved name
   if (~names.indexOf('add')) {
     throw new Error("'add' can't be used as a logger name, you could also divide by zero if you want to break the universe");
   }
   // Initialize loggers
   var initializedLoggers = [];
   names.map(String).forEach(function (name) {
-    loggers[name] = winston.loggers.add(name, getConfig(name));
+    var options = getConfig(name);
+    if (!options) {
+      throw new Error('Logger "' + name + '" has no defined configuration!');
+    }
+    loggers[name] = winston.loggers.add(name, options);
     initializedLoggers.push(loggers[name]);
   });
   // Return initialized loggers, keeping homogeneity with parameters format
