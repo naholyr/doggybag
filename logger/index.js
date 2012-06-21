@@ -12,8 +12,8 @@ loggers.cli = winston.cli();
 
 loggers.add = function add(names, config) {
   // Default config = embedded configuration handler using "logging" category
-  if (!config) {
-    config = require('../config').logging;
+  if (!config || typeof config === 'string') {
+    config = require('../config')[config || 'logging'];
   }
   // Retrieve a config part: supports hash or nconf-styled ".get"
   var getConfig = function (name) {
