@@ -1,4 +1,3 @@
-
 var expect = require('expect.js');
 
 process.env.NODE_ENV = 'test';
@@ -7,7 +6,7 @@ process.env.NODE_ENV = 'test';
 var config = require('../config');
 
 
-suite('doggybag/config', function(){
+suite('doggybag/config', function () {
 
   var dir = __dirname + "/config";
 
@@ -18,9 +17,13 @@ suite('doggybag/config', function(){
 
   test('throws when no file exists', function () {
     // Invalid name
-    expect(function () { config.add('undef', {"dir":dir}); }).to.throwError();
+    expect(function () {
+      config.add('undef', {"dir":dir});
+    }).to.throwError();
     // Invalid dir
-    expect(function () { config.add('sample', {"dir":"/tmp/undefdir"}); }).to.throwError();
+    expect(function () {
+      config.add('sample', {"dir":"/tmp/undefdir"});
+    }).to.throwError();
   });
 
   suite('- nconf', function () {

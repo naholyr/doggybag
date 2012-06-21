@@ -22,7 +22,7 @@ config.nconf = nconf;
 config.stores = nconf.stores;
 
 // Initialize a new provider from files, or
-config.add = function add (name, options) {
+config.add = function add(name, options) {
 
   // Support call "add(options)" without name
   if (typeof name === 'object' && !options) {
@@ -54,14 +54,16 @@ config.add = function add (name, options) {
     // Load from file(s)
 
     // Absolutize paths and keep existing ones only
-    files = files.map(function (file) { return path.resolve(dir, file) });
+    files = files.map(function (file) {
+      return path.resolve(dir, file)
+    });
     files = files.filter(path.existsSync);
     if (files.length > 1) {
       // Multiple files: merge (last one has priority)
-      nconf.add(name, { "type": "memory", "loadFrom": files });
+      nconf.add(name, { "type":"memory", "loadFrom":files });
     } else if (files.length > 0) {
       // Single file
-      nconf.add(name, { "type": "file", "file": files[0] });
+      nconf.add(name, { "type":"file", "file":files[0] });
     } else {
       // Nothing to load !
       throw new Error('No file found !')
