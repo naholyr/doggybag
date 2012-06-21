@@ -31,7 +31,7 @@ loggers.add = function add(names, config) {
   }
   // Initialize loggers
   var initializedLoggers = [];
-  names.forEach(function (name) {
+  names.map(String).forEach(function (name) {
     loggers[name] = winston.loggers.add(name, getConfig(name));
     initializedLoggers.push(loggers[name]);
   });
