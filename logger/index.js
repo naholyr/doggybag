@@ -29,8 +29,8 @@ loggers.add = function add(names, config) {
   }
   // names can be a single name
   if (!Array.isArray(names)) {
-    // In that case, option could be a single object only for this logger
-    if (typeof config.get !== 'function' && !config[names]) {
+    // In that case, and only if we work with a hash config, it can be a single hash for this single logger
+    if (typeof config.get !== 'function') {
       var loggerConfig = config;
       config = {};
       config[names] = loggerConfig;
