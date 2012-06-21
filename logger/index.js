@@ -21,8 +21,19 @@ loggers.add = function add(names, config) {
       return config[name];
     }
   };
+  // default names
+  if (!names) {
+    names = "default";
+  }
   // names can be a single name
   if (!Array.isArray(names)) {
+    // In that case, option could be a single object only for this logger
+    if (typeof config.get !== 'function' && !config[names]) {
+      var loggerConfig = config;
+      config = {};
+      config[names] = loggerConfig;
+    }
+    // Force array
     names = [names];
   }
   // Reserved name
