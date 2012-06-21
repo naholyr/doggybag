@@ -12,7 +12,8 @@ suite('doggybag/config', function () {
 
   test('always loads ENV and CLI', function () {
     expect(config.stores).to.be.an('object');
-    expect(Object.keys(config.stores)).to.eql(['env', 'argv']);
+    expect(config.stores).to.have.key('env');
+    expect(config.stores).to.have.key('argv');
   });
 
   test('throws when no file exists', function () {

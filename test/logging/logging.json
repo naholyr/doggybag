@@ -1,0 +1,16 @@
+{
+  "fromConfig1":{
+    "console":{
+      "level":"warn",
+      "colorize":true,
+      "timestamp":true
+    }
+  },
+  "fromConfig2":{
+    "console":{
+      "level":"silly",
+      "colorize":true,
+      "timestamp":false
+    }
+  }
+}
