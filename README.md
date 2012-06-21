@@ -189,10 +189,16 @@ The key configuration:
 **/lib/logger.js**
 
 ```javascript
-// configuration has been initialized before
+// Initialize configuration
+var conf = require('doggybag/config');
+conf.add('logging', { "dir": __dirname + "/../config" });
+// Note: we add "loggers" in configuration
+
+// Expose loggers
 var log = module.exports = require('doggybag/logger');
 
-log.add(['backend', 'frontend']);
+// Initialize
+log.add(conf.get('loggers'), conf);
 ```
 
 **/path/to/app/app.js**
@@ -201,3 +207,5 @@ var log = require('/path/to/lib/logger.js').frontend;
 
 log.info('someone visited my website :O');
 ```
+
+This way, whenever we want to change a logging behavior, or even add a new logger we just have to edit config JSON files.
