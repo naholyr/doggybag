@@ -1,3 +1,3 @@
-suite('doggybag/forms', function(){
+suite('doggybag/forms', function () {
 
 });
