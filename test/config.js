@@ -56,7 +56,7 @@ suite('doggybag/config', function () {
 
     var provider;
 
-    setup(function () {
+    suiteSetup(function () {
       provider = config.add({"dir":dir});
     });
 
@@ -83,7 +83,7 @@ suite('doggybag/config', function () {
 
     var provider;
 
-    setup(function () {
+    suiteSetup(function () {
       provider = config.add({"dir":dir, "env":"good"});
     });
 
@@ -102,7 +102,7 @@ suite('doggybag/config', function () {
 
     var provider;
 
-    setup(function () {
+    suiteSetup(function () {
       provider = config.add('sample', {"dir":dir, "noShortcut":true});
     });
 

@@ -33,7 +33,7 @@ suite('doggybag/logger', function () {
 
   suite('work with hashes', function () {
 
-    setup(function () {
+    suiteSetup(function () {
       logger.add('one', {
         console:{}
       });
@@ -45,7 +45,7 @@ suite('doggybag/logger', function () {
 
     suite('multiple at once', function () {
 
-      setup(function () {
+      suiteSetup(function () {
         logger.add(['two', 'three'], {
           two:{
             console:{}
@@ -74,7 +74,7 @@ suite('doggybag/logger', function () {
 
   suite('work with doggybag/config', function () {
 
-    setup(function () {
+    suiteSetup(function () {
       require('../config').add('logging', {dir:__dirname + "/logging"});
     });
 
