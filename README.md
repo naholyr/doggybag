@@ -11,7 +11,7 @@ While looking a name for this project, we asked to translate the word *toolbox*
 in Japanese to our japanese-speaking-guy
 ([Guillaume](https://github.com/gmarty)).
 
-As his answer sounded like *doggybag*, we laughed and decided to call it as is.
+As his answer *dôgubako* (道具箱) sounded like *doggybag*, we laughed and decided to call it as is.
 It's also a way to carry delicious stuff at home, or at work.
 
 
