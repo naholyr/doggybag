@@ -68,15 +68,16 @@ var form = forms.create({
 });
 
 // Handling form
-if (req.method === 'POST') {
-  form.bind(req.body, req.files);
-  if (form.isValid()) {
-    // Save to database
+form.bind(req.body, req.files).validate(function(err, f) {
+  if (f.isValid()) {
+    // OK: redirect ?
+  } else {
+    // Error: display form again (errors will be automatically shown) ?
   }
-}
+});
 
 // show form (including errors eventually)
-var html = form.render(forms.render.twBootstrap);
+var html = form.toHTML(forms.render.twBootstrap);
 ```
 
 
