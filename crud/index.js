@@ -41,7 +41,7 @@ function initializeApp(options) {
     object.remove(cb);
   };
   var formValues = options.values || function (object, cb) {
-    cb(null, object.toObject({ 'getters':true }))
+    cb(null, typeof object.toObject === 'function' ? object.toObject({ 'getters':true }) : object)
   };
   var renderForm = options.renderForm || function renderForm(form, forms, cb) {
     cb(null, form.toHTML(forms.render.twBootstrap))
