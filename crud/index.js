@@ -488,15 +488,6 @@ var helpers = {
       });
     };
   },
-  // Ease adding the "more info" part to your form
-  'addCreatedAtUpdatedAt':function (form, object, res, fn) {
-    res.partial('crud/date_info', { 'locals':{ 'object':object } }, function (err, html) {
-      if (!err && html) {
-        form.fields.info = forms.fields.constant({ 'widget':forms.widgets.html(html), 'label':'Additional information' });
-      }
-      fn(null, form);
-    });
-  },
   // Apply [[field, order], [field, order], ...] sorting rules to an array of objects
   'sortArray':function (objects, sort) {
     var comparator = function (rule) {
