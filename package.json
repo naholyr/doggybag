@@ -18,7 +18,8 @@
     "amqp": "~0.1.3",
     "node-uuid": "~1.3.3",
     "winston": "~0.6.1",
-    "forms": "git+http://github.com/caolan/forms.git#e117c0eb58"
+    "forms": "git+http://github.com/caolan/forms.git#e117c0eb58",
+    "async": "~0.1.22"
   },
   "devDependencies": {
     "mocha": "~1.0.3",
