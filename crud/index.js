@@ -6,7 +6,7 @@
 
 var express = require('express');
 var async = require('async');
-var forms = require('./../forms-extended');
+var forms = require('../forms');
 
 /**
  * Initialize CRUD app
