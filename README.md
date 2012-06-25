@@ -249,6 +249,8 @@ This way, whenever we want to change a logging behavior, or even add a new logge
 
 ## Express CRUD
 
+See `doc/crud.md` for detailed documentation.
+
 This component acts as an Express app builder you can use in your back-office. It's still in development and does not
 provide the whole set of features we planned initially as we didn't need them immediately.
 
@@ -382,3 +384,13 @@ app.mount('/users', users);
   * `title`: page title
   * `form` (string): the rendered form.
   * `save_url`: form's action.
+
+### Helpers
+
+Available un `crud.helpers` they will help you enjoy this component even in more advanced situations:
+
+* `defineLocals` helps you map partials to view locals, very useful for i18n for example. It will return a function you
+  can safely pass to `editLocals` or `listLocals` options. Example:
+  `"listLocals":crud.helpers.defineLocals({ "table":"/path/to/views/list_table", "title":"/path/to/views/list_title" })`
+* `sortArray` allows you to apply the `sort` option to an array of objects. Especially useful when you work with
+  simple arrays and cannot rely on Mongoose's sort ability.
