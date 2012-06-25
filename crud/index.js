@@ -29,27 +29,59 @@ function initializeApp(options) {
   var viewKey = options.varname || 'object';
   var viewKeyPlural = options.varsname || (viewKey + 's');
   var viewDir = options.views || 'crud';
-  var newObject = options.new || function newObject(data, cb) { new Model(data).save(cb) };
-  var updateObject = options.update || function updateObject(object, data, cb) { Model.update({ '_id': object.id }, data, function(err) { cb(err, object) }); };
-  var removeObject = options.remove || function removeObject(object, cb) { object.remove(cb); };
-  var formValues = options.values || function(object, cb) { cb(null, object.toObject({ 'getters': true })) };
-  var renderForm = options.renderForm || function renderForm(form, forms, cb) { cb(null, form.toHTML(forms.render.twBootstrap)) };
-  var beforeEdit = options.beforeEdit || function beforeEdit(req, res, next) { next() };
-  var beforeList = options.beforeList || function beforeList(req, res, next) { next() };
+  var newObject = options.new || function newObject(data, cb) {
+    new Model(data).save(cb)
+  };
+  var updateObject = options.update || function updateObject(object, data, cb) {
+    Model.update({ '_id':object.id }, data, function (err) {
+      cb(err, object)
+    });
+  };
+  var removeObject = options.remove || function removeObject(object, cb) {
+    object.remove(cb);
+  };
+  var formValues = options.values || function (object, cb) {
+    cb(null, object.toObject({ 'getters':true }))
+  };
+  var renderForm = options.renderForm || function renderForm(form, forms, cb) {
+    cb(null, form.toHTML(forms.render.twBootstrap))
+  };
+  var beforeEdit = options.beforeEdit || function beforeEdit(req, res, next) {
+    next()
+  };
+  var beforeList = options.beforeList || function beforeList(req, res, next) {
+    next()
+  };
   var uriPrefix = options.prefix || '';
   var nbPerPage = options.nbPerPage || 25;
-  var countPages = options.countPages || function countPages(nbPerPage, cb, req, res) { Model.count(function(err, nb) { cb(err, err ? 0 : Math.ceil(nb / nbPerPage)) }) };
-  var defaultSort = options.defaultSort || [['_id', 'ascending']];
+  var countPages = options.countPages || function countPages(nbPerPage, cb, req, res) {
+    Model.count(function (err, nb) {
+      cb(err, err ? 0 : Math.ceil(nb / nbPerPage))
+    })
+  };
+  var defaultSort = options.defaultSort || [
+    ['_id', 'ascending']
+  ];
   var findAll = options.findAll || function findAll(page, nb, sort, cb, req, res) {
     var q = Model.find().skip((page - 1) * nb);
     // Apply sorting: Query#sort(key, order)
-    if (sort) sort.forEach(function(o) { q.sort.apply(q, o) });
+    if (sort) sort.forEach(function (o) {
+      q.sort.apply(q, o)
+    });
     q.limit(page * nb).run(cb);
   };
-  var findOne = options.findOne || function findOne(id, cb, req, res) { Model.findById(id, cb) };
-  var editLocals = options.editLocals || function editLocals(object, cb, req, res) { cb(null) };
-  var listLocals = options.listLocals || function listLocals(object, cb, req, res) { cb(null) };
-  var gettext = options.gettext || function gettext(string, req) { return (req.i18n && req.i18n.gettext) ? req.i18n.gettext(string) : string };
+  var findOne = options.findOne || function findOne(id, cb, req, res) {
+    Model.findById(id, cb)
+  };
+  var editLocals = options.editLocals || function editLocals(object, cb, req, res) {
+    cb(null)
+  };
+  var listLocals = options.listLocals || function listLocals(object, cb, req, res) {
+    cb(null)
+  };
+  var gettext = options.gettext || function gettext(string, req) {
+    return (req.i18n && req.i18n.gettext) ? req.i18n.gettext(string) : string
+  };
 
   /**
    * Returned app (meant to be used as middleware)
@@ -64,8 +96,8 @@ function initializeApp(options) {
   /**
    * Always define view variable 'crud_basepath' to customize links
    */
-  app.configure(function() {
-    app.use(function(req, res, next) {
+  app.configure(function () {
+    app.use(function (req, res, next) {
       res.local('crud_basepath', app.settings.basepath || '');
       next();
     });
@@ -80,20 +112,20 @@ function initializeApp(options) {
   function setObjects(req, res, next) {
     async.parallel([
       // Count pages
-      function(cb) {
-        countPages(nbPerPage, function(err, nbPages) {
+      function (cb) {
+        countPages(nbPerPage, function (err, nbPages) {
           res.local('nbPages', nbPages);
           res.local('isPaginated', nbPages > 1);
           cb(err);
         }, req, res);
       },
       // Find objects
-      function(cb) {
+      function (cb) {
         var page = parseInt(req.query.page, 10) || 1;
         res.local('numPage', page);
         // TODO sort can be configured from request params, should use a configurable callback
         var sort = defaultSort;
-        findAll(req.query.page || 1, nbPerPage, sort, function(err, objects) {
+        findAll(req.query.page || 1, nbPerPage, sort, function (err, objects) {
           if (err) {
             message(res, gettext('Failed retrieving objects.', req), err);
             objects = [];
@@ -102,7 +134,7 @@ function initializeApp(options) {
           cb();
         }, req, res);
       }
-    ], function(err) {
+    ], function (err) {
       if (!err) {
         // Additional view variables for pagination, if template engine doesn't support expressions
         if (res.local('numPage') > 1) {
@@ -113,10 +145,10 @@ function initializeApp(options) {
         }
         // If template engine doesn't support for-loops
         // TODO insert separators for huge number of pages, should result in something like "1 2 3 4 5  …  37 38 *39* 40 41  …  121 122 123 124 125"
-        res.local('pages', (function(n) {
+        res.local('pages', (function (n) {
           var a = [];
           for (var p = 1; p < n + 1; p++) {
-            a.push({ 'page': p, 'active': p === res.local('numPage') });
+            a.push({ 'page':p, 'active':p === res.local('numPage') });
           }
           return a;
         })(res.local('nbPages')));
@@ -132,7 +164,7 @@ function initializeApp(options) {
    * @see options.model, options.findOne
    */
   function resolveObjectId(req, res, next, id) {
-    findOne(id, function(err, object) {
+    findOne(id, function (err, object) {
       if (err || !object) {
         // Go back to list mode and display error
         message(res, gettext('Failed retrieving object.', req), err || 'Not found');
@@ -153,17 +185,17 @@ function initializeApp(options) {
     var formId = 'form' + Math.ceil(Math.random() * 100000);
     res.local('formId', formId);
     var rules = [];
-    Object.keys(form.fields).forEach(function(fieldName) {
+    Object.keys(form.fields).forEach(function (fieldName) {
       var field = form.fields[fieldName];
       var attributes = [];
       if (field.required) {
-        attributes.push({ 'name': 'required' });
+        attributes.push({ 'name':'required' });
       }
-      Object.keys(field.htmlValidators || {}).forEach(function(name) {
-        attributes.push({ 'name': name, 'value': field.htmlValidators[name] });
+      Object.keys(field.htmlValidators || {}).forEach(function (name) {
+        attributes.push({ 'name':name, 'value':field.htmlValidators[name] });
       });
       if (attributes.length) {
-        rules.push({ 'fieldName': fieldName, 'attributes': attributes });
+        rules.push({ 'fieldName':fieldName, 'attributes':attributes });
       }
     });
     res.local('clientSideValidation', rules);
@@ -177,7 +209,7 @@ function initializeApp(options) {
    */
   function setForm(req, res, next) {
     // Build the form
-    makeForm(forms, function(err, form) {
+    makeForm(forms, function (err, form) {
       if (err || !form) {
         // Go back to list mode and display error
         message(res, gettext('Failed building form.', req), err || 'Unexpected error');
@@ -198,7 +230,7 @@ function initializeApp(options) {
           // don't use form.bind(values), we only want to specify default values
           // using "bind()" would erase values not present in "values" but with a default value defined
           // instead, we change field's default value
-          Object.keys(values).forEach(function(k) {
+          Object.keys(values).forEach(function (k) {
             if (typeof values[k] !== 'undefined' && form.fields[k]) {
               form.fields[k].value = values[k];
             }
@@ -207,7 +239,7 @@ function initializeApp(options) {
         next();
       };
       // Grab default values from model
-      formValues(req[viewKey], function(err, values) {
+      formValues(req[viewKey], function (err, values) {
         if (err) return onValues(err, values);
         var valueCallbacks = Object.keys(form.fields).map(function valueCallback(k) {
           var f = form.fields[k];
@@ -219,10 +251,22 @@ function initializeApp(options) {
           if (f.modelValue) {
             // Asynchronous
             if (f.modelValue.length === 2) {
-              return function(cb) { f.modelValue(req[viewKey], function(err, v) { cb(err, values[k] = v) }) };
+              return function (cb) {
+                f.modelValue(req[viewKey], function (err, v) {
+                  cb(err, values[k] = v)
+                })
+              };
             }
             // Synchronous
-            return function(cb) { var e, v; try { v = f.modelValue(req[viewKey]) } catch (err) { e = err } cb(e, values[k] = v) };
+            return function (cb) {
+              var e, v;
+              try {
+                v = f.modelValue(req[viewKey])
+              } catch (err) {
+                e = err
+              }
+              cb(e, values[k] = v)
+            };
           }
           // Last case: we assign corresponding model field, only if value has not been defined in "formValues"
           if (typeof values[k] === 'undefined' && typeof req[viewKey][k] !== 'undefined') {
@@ -231,9 +275,13 @@ function initializeApp(options) {
           }
         });
         // Remove falsey callbacks before passing to async.parallel
-        valueCallbacks = valueCallbacks.filter(function isTruthy(v) { return !!v });
+        valueCallbacks = valueCallbacks.filter(function isTruthy(v) {
+          return !!v
+        });
         // Execute all the modelValue()s and respond
-        async.parallel(valueCallbacks, function(err) { onValues(err, values) });
+        async.parallel(valueCallbacks, function (err) {
+          onValues(err, values)
+        });
       }, req, res);
     }, req, res);
   }
@@ -245,7 +293,7 @@ function initializeApp(options) {
    * @see options.views
    */
   function list(req, res, next) {
-    listLocals(req[viewKeyPlural], function(err, locals) {
+    listLocals(req[viewKeyPlural], function (err, locals) {
       if (err) return next(err); // This one may be unrecoverable :-\
       locals = locals || {};
       locals.title = locals.title || ('List ' + viewKeyPlural);
@@ -265,12 +313,12 @@ function initializeApp(options) {
    * @see options.renderForm, options.views
    */
   function edit(req, res, next) {
-    renderForm(req.form, forms, function(err, html) {
+    renderForm(req.form, forms, function (err, html) {
       if (err) {
         message(res, gettext('Failed rendering form.', req), err);
         html = '';
       }
-      editLocals(req[viewKey], function(err, locals) {
+      editLocals(req[viewKey], function (err, locals) {
         if (err) return next(err); // This one may be unrecoverable :-\
         locals = locals || {};
         locals.form = html;
@@ -301,19 +349,22 @@ function initializeApp(options) {
         message(res, gettext('Successfully saved object.', req), null, 'success');
         // Display edit form using the required middlewares to retrieve object and generate proper form
         // TODO redirect (303) with a flash message using sessions (waiting for sessions, coming with authentication)
-        resolveObjectId(req, res, function() { setForm(req, res, next); }, object.id);
+        resolveObjectId(req, res, function () {
+          setForm(req, res, next);
+        }, object.id);
       }
     }
+
     // Complete request data: make files available in req.body so that forms.handle() works properly
     if (req.files) {
-      Object.keys(req.files).forEach(function(name) {
+      Object.keys(req.files).forEach(function (name) {
         if (req.files[name].name) {
           req.body[name] = req.files[name];
         }
       });
     }
     // Handle request data
-    req.form.bind(req.body).validate(function(err, f) {
+    req.form.bind(req.body).validate(function (err, f) {
       if (f.isValid()) {
         data = f.data;
         if (req[viewKey]) {
@@ -339,7 +390,7 @@ function initializeApp(options) {
       message(res, gettext('Failed removing object.', req), 'Not found');
       next();
     } else {
-      removeObject(object, function(err) {
+      removeObject(object, function (err) {
         message(res, err ? gettext('Failed removing object.', req) : gettext('Object successfully removed.', req), err, err ? null : 'success');
         next();
       }, req, res);
@@ -372,7 +423,7 @@ function message(res, text, error, type) {
     console.error('CRUD Error!', error.stack || error); // TODO logging
     text += ' → ' + error;
   }
-  res.local('message', { 'type': type, 'text': text });
+  res.local('message', { 'type':type, 'text':text });
 }
 
 
@@ -382,53 +433,55 @@ function message(res, text, error, type) {
  */
 var helpers = {
   // @see options.listLocals, options.editLocals
-  'defineLocals': function(indirects, directs) {
+  'defineLocals':function (indirects, directs) {
     // Reformat all values as functions
     var functions = [];
     var names = [];
     // Indirects are used as-is (function) or wrapped with res.partial()
     var valueAsPartial = function valueAsPartial(value) {
       var path = String(value);
-      return function(data, fn, req, res) {
+      return function (data, fn, req, res) {
         res.partial(path, fn);
       };
     };
     var indirectNames = Object.keys(indirects || {});
     names = names.concat(indirectNames);
-    functions = functions.concat(indirectNames.map(function(name) {
+    functions = functions.concat(indirectNames.map(function (name) {
       return (typeof indirects[name] === 'function') ? indirects[name] : valueAsPartial(indirects[name]);
     }));
     // Directs are wrapped in a fake async flavor
     var makeAsync = function valueAsAsync(value) {
       if (typeof value === 'function') {
         // Wrapped sync function
-        return function(data, fn, req, res) {
+        return function (data, fn, req, res) {
           fn(null, value(data, req, res));
         };
       } else {
         // Wrapped single value
-        return function(data, fn, req, res) {
+        return function (data, fn, req, res) {
           fn(null, String(value));
         };
       }
     };
     var directNames = Object.keys(directs || {});
     names = names.concat(directNames);
-    functions = functions.concat(directNames.map(function(name) {
+    functions = functions.concat(directNames.map(function (name) {
       return makeAsync(directs[name]);
     }));
     // Build the "listLocals" / "editLocals" callback
-    return function(data, cb, req, res) {
+    return function (data, cb, req, res) {
       var locals = {};
       // All functions are the same signature, we just all call them as async
-      async.parallel(functions.map(function(foo) {
+      async.parallel(functions.map(function (foo) {
         // Simply call reformated-as-async function
-        return function(cb) { foo(data, cb, req, res) };
-      }), function(err, values) {
+        return function (cb) {
+          foo(data, cb, req, res)
+        };
+      }), function (err, values) {
         if (err) return cb(err);
         // map names and values (async guarantees order)
         var locals = {};
-        names.forEach(function(name, i) {
+        names.forEach(function (name, i) {
           locals[name] = values[i];
         });
         cb(null, locals);
@@ -436,17 +489,17 @@ var helpers = {
     };
   },
   // Ease adding the "more info" part to your form
-  'addCreatedAtUpdatedAt': function(form, object, res, fn) {
-    res.partial('crud/date_info', { 'locals': { 'object': object } }, function(err, html) {
+  'addCreatedAtUpdatedAt':function (form, object, res, fn) {
+    res.partial('crud/date_info', { 'locals':{ 'object':object } }, function (err, html) {
       if (!err && html) {
-        form.fields.info = forms.fields.constant({ 'widget': forms.widgets.html(html), 'label': 'Additional information' });
+        form.fields.info = forms.fields.constant({ 'widget':forms.widgets.html(html), 'label':'Additional information' });
       }
       fn(null, form);
     });
   },
   // Apply [[field, order], [field, order], ...] sorting rules to an array of objects
-  'sortArray': function(objects, sort) {
-    var comparator = function(rule) {
+  'sortArray':function (objects, sort) {
+    var comparator = function (rule) {
       var field = rule[0];
       var order = rule[1] || 'asc';
       switch (String(order).toLowerCase()) {
@@ -459,13 +512,15 @@ var helpers = {
           order = +1;
           break;
       }
-      return function(o1, o2) {
+      return function (o1, o2) {
         var f1 = o1[field], f2 = o2[field];
         return order * (f1 > f2 ? +1 : (f1 < f2 ? -1 : 0));
       };
     };
     if (sort) {
-      sort.forEach(function(o) { objects.sort(comparator(o)); });
+      sort.forEach(function (o) {
+        objects.sort(comparator(o));
+      });
     }
     return objects;
   }
@@ -480,8 +535,8 @@ var helpers = {
  * * init: CRUD app generator
  */
 module.exports = {
-  'express': express,
-  'forms': forms,
-  'init': initializeApp,
-  'helpers': helpers
+  'express':express,
+  'forms':forms,
+  'init':initializeApp,
+  'helpers':helpers
 };
