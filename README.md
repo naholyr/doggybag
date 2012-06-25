@@ -244,3 +244,135 @@ log.info('someone visited my website :O');
 ```
 
 This way, whenever we want to change a logging behavior, or even add a new logger we just have to edit config JSON files.
+
+
+
+## Express CRUD
+
+This component acts as an Express app builder you can use in your back-office. It's still in development and does not
+provide the whole set of features we planned initially as we didn't need them immediately.
+
+It's based on `forms`.
+
+It's made to work natively with Mongoose models, but could work with any type of data, given you provide the necessary
+access layers.
+
+### Missing features
+
+* Sorting in list mode
+* Filtering in list mode
+* Automatic helpers for partials:
+  * URL generator
+  * Confirmation for deletion
+  * Pagination
+  * …
+
+### Usage
+
+Example: to add a `/users` route to your app to manage your `User` model, you need to define a few partials and just
+call `crud.init()`.
+
+#### Partial `_list_table`
+
+The template depends so much on your own style, and you could want something that is totally independent from your
+model, then we decided to not provide any defaults or API for the list mode. Just display it the way you need.
+
+```html
+<table class="table table-striped">
+  <thead>
+  <tr>
+    <th>{{_ "Name"}}</th>
+    <th>{{_ "E-mail"}}</th>
+    <th>{{_ "Actions"}}</th>
+  </tr>
+  </thead>
+  <tbody>
+  {{#each users}}
+  <tr>
+    <td><a href="{{../crud_basepath}}/{{_id}}"><strong>{{name}}</strong></a></td>
+    <td><a href="mailto:{{email}}">{{email}}</a></td>
+    <td><ul>
+      <li><a href="{{../crud_basepath}}/{{_id}}" class="btn">{{_ "Edit"}}</a></li>
+      <li><a href="#" onclick="(function(f){if(confirm('{{_ "Are you sure you want to permanently delete user `%s`?" name}}')){f.action='{{../crud_basepath}}/delete/{{_id}}';f.submit();}return false;})(document.getElementById('deleteForm'))">{{_ "Delete"}}</a></li>
+        </ul>
+      </div>
+    </td>
+  </tr>
+  {{/each}}
+  </tbody>
+</table>
+
+{{#if isPaginated}}
+{{#if previousPage}}<a href="?page={{previousPage}}>«</a>{{/if}
+{{numPage}}/{{nbPages}}
+{{#if nextPage}}<a href="?page={{nextPage}}>»</a>{{/if}
+{{/if}}
+```
+
+Note: `crud_basepath` is automatically defined and safe to use.
+
+#### JavaScript
+
+```javascript
+var crud = require('doggybag/crud');
+
+var users = crud.init({
+  model: mongoose.model('User'),
+  listLocals: crud.helpers.defineLocals({table: "projects/list_table"})
+});
+
+app.mount('/users', users);
+```
+
+### Options of `crud.init()`
+
+* `model`: Mongoose model (if you don't define this option, you **must** define `findAll` & `countPages` & `findOne` & `new` & `update` & `remove`).
+  * `new`: method to create a new object from form data (`function(data,cb)` with cb being `function(err,object)`, default calls `new model`).
+  * `update`: method to update an object from form data (`function(object,data,cb)` with cb being `function(err,object)`, default calls `model.update`).
+  * `remove`: method to delete an object (`function(object,cb)` with cb being `function(err)`, default calls `object.remove`).
+  * `findAll`: method to find all elements (`function(page,nb,sort,cb)` with cb being `function(err,objects)`, default calls `model.find`).
+  * `findOne`: method to find an alement by id (`function(id,cb)` with cb being `function(err,object)`, default calls `model.findById`).
+  * `countPages`: method to count total number of pages (`function(nbPerPage,cb)`, cb being `function(err,nbPages)`, default calls `model.count`).
+* `views`: path to your views.
+* `prefix`: a prefix you can define if you need to "namespace" your URIs. Very useful for a CRUD about embedded documents.
+* `gettext`: if you use a translation tool, and it's not `req.i18n.gettext` you need to override this option as `function(string,req)` which returns translated `string`.
+* For edit mode:
+  * `form`: mandatory `function(forms,cb)` with cb being a `function(err,generatedForm)`. This is where you build the edit form.
+  * `varname`: variable name of your object in edit mode (default `object`).
+  * `beforeEdit`: Express middleware called before rendering.
+  * `editLocals`: called to define additional locals (`function(object,cb)` cb being `function(locals)`, default calls `cb(null)`).
+  * `values`: method to calculate values passed to form, very useful if some fields are not corresponding to your model (`function(object,cb)`, cb being `function(err,values)`, default calls `object.toObject`).
+  * `renderForm`: method to render your form (`function(form,forms,cb)` with cb being `function(err,html)`, default calls `form.toHTML(forms.render.twBootstrap)`).
+* For list mode:
+  * `varsname`: variable name of your objects's list in list mode (default `varname+'s'`).
+  * `beforeList`: Express middleware called before rendering.
+  * `nbPerPage`: pagination in list mode (default 25).
+  * `defaultSort`: default sorting mode (an array of `[field,direction]`, default `[["_id", "asc"]]`).
+  * `listLocals`: called to define additional locals (`function(objects,cb)` cb being `function(locals)`, default calls `cb(null)`).
+
+### Available view locals
+
+* In all modes
+  * `crud_basepath` (string): the base URL.
+  * `message` (object with keys `type` and `text`): a message to be displayed to user (error, success).
+* In list mode
+  * `objects` (array of object): contains the objects displayed. The variable name can be configured.
+  * `isPaginated` (boolean): is number of pages greater than 1 ? The following variables are then defined:
+    * `nbPages` (int): number of pages.
+    * `numPage` (int): current page (taken from URL's parameter `page`, default 1).
+    * `previousPage` (int): previous page (defined only if applicable).
+    * `nextPage` (int): next page (defined only if applicable).
+    * `pages` (array of int): all pages.
+  * `title`: page title.
+  * `empty` (boolean): if `count` is 0.
+  * `count` (int): number of objects.
+  * `table` (string): the main table (i.e. your partial rendered).
+* In create/edit mode
+  * `object`: contains the object edited. The variable name can be configured.
+  * `formId` (string): a random unique ID you can use for your form (very useful if you have more than one crud per page).
+  * `clientSideValidation` (array of rules): a rule is a hash with keys `fieldName` and `attributes` being a hash of `name: value`.
+    It defines the HTML5 attributes you should add to your markup. It's automatically added on client with JS if you use default
+    templates. You can specify your own HTML5 validations adding a `html5Validators` array to your `forms`' field.
+  * `title`: page title
+  * `form` (string): the rendered form.
+  * `save_url`: form's action.
