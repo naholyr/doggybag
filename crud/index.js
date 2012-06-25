@@ -101,6 +101,8 @@ function initializeApp(options) {
       res.local('crud_basepath', app.settings.basepath || '');
       next();
     });
+    app.use(express.bodyParser());
+    app.use(app.router);
   });
 
   /**
