@@ -49,6 +49,7 @@ function initializeApp(options) {
   var findOne = options.findOne || function findOne(id, cb, req, res) { Model.findById(id, cb) };
   var editLocals = options.editLocals || function editLocals(object, cb, req, res) { cb(null) };
   var listLocals = options.listLocals || function listLocals(object, cb, req, res) { cb(null) };
+  var gettext = options.gettext || function gettext(string, req) { return (req.i18n && req.i18n.gettext) ? req.i18n.gettext(string) : string };
 
   /**
    * Returned app (meant to be used as middleware)
@@ -94,7 +95,7 @@ function initializeApp(options) {
         var sort = defaultSort;
         findAll(req.query.page || 1, nbPerPage, sort, function(err, objects) {
           if (err) {
-            message(res, req.i18n.gettext('Failed retrieving objects.'), err);
+            message(res, gettext('Failed retrieving objects.', req), err);
             objects = [];
           }
           res.local(viewKeyPlural, req[viewKeyPlural] = objects);
@@ -134,7 +135,7 @@ function initializeApp(options) {
     findOne(id, function(err, object) {
       if (err || !object) {
         // Go back to list mode and display error
-        message(res, req.i18n.gettext('Failed retrieving object.'), err || 'Not found');
+        message(res, gettext('Failed retrieving object.', req), err || 'Not found');
         return list(req, res, next);
       }
       res.local(viewKey, req[viewKey] = object);
@@ -179,7 +180,7 @@ function initializeApp(options) {
     makeForm(forms, function(err, form) {
       if (err || !form) {
         // Go back to list mode and display error
-        message(res, req.i18n.gettext('Failed building form.'), err || 'Unexpected error');
+        message(res, gettext('Failed building form.', req), err || 'Unexpected error');
         return list(req, res, next);
       }
       req.form = form;
@@ -192,7 +193,7 @@ function initializeApp(options) {
         if (err) {
           // Error while retrieving default values: display empty form ?
           // TODO maybe we should redirect to list ? Study possible cases here
-          message(res, req.i18n.gettext('Failed retrieving form values.'), err);
+          message(res, gettext('Failed retrieving form values.', req), err);
         } else if (values) {
           // don't use form.bind(values), we only want to specify default values
           // using "bind()" would erase values not present in "values" but with a default value defined
@@ -250,7 +251,7 @@ function initializeApp(options) {
       locals.title = locals.title || ('List ' + viewKeyPlural);
       locals.filters = locals.filters || null;
       locals.empty = locals.empty || ('No ' + viewKey);
-      locals.table = locals.table || '<div class="alert alert-danger">' + req.i18n.gettext('ERROR: no table to display') + '</div>';
+      locals.table = locals.table || '<div class="alert alert-danger">' + gettext('ERROR: no table to display', req) + '</div>';
       locals.count = req[viewKeyPlural].length;
       res.render(viewDir + '/list', locals);
     }, req, res);
@@ -266,7 +267,7 @@ function initializeApp(options) {
   function edit(req, res, next) {
     renderForm(req.form, forms, function(err, html) {
       if (err) {
-        message(res, req.i18n.gettext('Failed rendering form.'), err);
+        message(res, gettext('Failed rendering form.', req), err);
         html = '';
       }
       editLocals(req[viewKey], function(err, locals) {
@@ -293,11 +294,11 @@ function initializeApp(options) {
     function postSave(err, object) {
       res.local(viewKey, req[viewKey] = object); // Bind updated object
       if (err) {
-        message(res, req.i18n.gettext('The object failed to be saved.'), err);
+        message(res, gettext('The object failed to be saved.', req), err);
         // Directly send back to create mode
         next();
       } else {
-        message(res, req.i18n.gettext('Successfully saved object.'), null, 'success');
+        message(res, gettext('Successfully saved object.', req), null, 'success');
         // Display edit form using the required middlewares to retrieve object and generate proper form
         // TODO redirect (303) with a flash message using sessions (waiting for sessions, coming with authentication)
         resolveObjectId(req, res, function() { setForm(req, res, next); }, object.id);
@@ -321,7 +322,7 @@ function initializeApp(options) {
           newObject(f.data, postSave, req, res);
         }
       } else {
-        postSave(err || new Error(req.i18n.gettext('Invalid form.')), req[viewKey]);
+        postSave(err || new Error(gettext('Invalid form.', req)), req[viewKey]);
       }
     });
   }
@@ -335,11 +336,11 @@ function initializeApp(options) {
   function remove(req, res, next) {
     var object = req[viewKey];
     if (!object) {
-      message(res, req.i18n.gettext('Failed removing object.'), 'Not found');
+      message(res, gettext('Failed removing object.', req), 'Not found');
       next();
     } else {
       removeObject(object, function(err) {
-        message(res, err ? req.i18n.gettext('Failed removing object.') : req.i18n.gettext('Object successfully removed.'), err, err ? null : 'success');
+        message(res, err ? gettext('Failed removing object.', req) : gettext('Object successfully removed.', req), err, err ? null : 'success');
         next();
       }, req, res);
     }
