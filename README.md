@@ -394,3 +394,5 @@ Available un `crud.helpers` they will help you enjoy this component even in more
   `"listLocals":crud.helpers.defineLocals({ "table":"/path/to/views/list_table", "title":"/path/to/views/list_title" })`
 * `sortArray` allows you to apply the `sort` option to an array of objects. Especially useful when you work with
   simple arrays and cannot rely on Mongoose's sort ability.
+
+To see a simple example of fully working CRUD for an in-memory array, look at the unit tests in `test/crud.js`.
