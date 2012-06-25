@@ -8,7 +8,7 @@
     "url": "git://github.com/oncletom/doggybag.git"
   },
   "scripts": {
-    "test": "./node_modules/.bin/mocha --ui tdd --reporter list"
+    "test": "./node_modules/.bin/mocha --ui tdd --reporter list --ignore-leaks"
   },
   "engines": {
     "node": "~0.6.18"
