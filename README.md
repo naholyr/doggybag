@@ -267,6 +267,12 @@ access layers.
   * Pagination
   * …
 
+### Installation
+
+You may need to copy the templates in `node_modules/doggybag/crud/views` and customize them the way you want. These
+are the "layouts" for your CRUD modules, they must fill in your global layout, and will be completed with partials
+(you must write too) for edit and list modes.
+
 ### Usage
 
 Example: to add a `/users` route to your app to manage your `User` model, you need to define a few partials and just
@@ -333,7 +339,7 @@ app.mount('/users', users);
   * `findAll`: method to find all elements (`function(page,nb,sort,cb)` with cb being `function(err,objects)`, default calls `model.find`).
   * `findOne`: method to find an alement by id (`function(id,cb)` with cb being `function(err,object)`, default calls `model.findById`).
   * `countPages`: method to count total number of pages (`function(nbPerPage,cb)`, cb being `function(err,nbPages)`, default calls `model.count`).
-* `views`: path to your views.
+* `views`: path to your views `edit` and `list` (defaults to embedded views so it can work out of the box given you use `hbs` template engine, but you may copy and customize those views).
 * `prefix`: a prefix you can define if you need to "namespace" your URIs. Very useful for a CRUD about embedded documents.
 * `gettext`: if you use a translation tool, and it's not `req.i18n.gettext` you need to override this option as `function(string,req)` which returns translated `string`.
 * For edit mode:

@@ -28,7 +28,7 @@ function initializeApp(options) {
   if (!makeForm) throw new Error('Mandatory option "form"');
   var viewKey = options.varname || 'object';
   var viewKeyPlural = options.varsname || (viewKey + 's');
-  var viewDir = options.views || 'crud';
+  var viewDir = options.views || (__dirname + '/views');
   var newObject = options.new || function newObject(data, cb) {
     new Model(data).save(cb)
   };
