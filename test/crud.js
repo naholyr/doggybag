@@ -150,6 +150,8 @@ suite('doggybag/crud', function () {
       });
     });
 
+    // Removed until mikeal/request#255 is published to npm
+    /*
     test('missing required field', function (done) {
       browser.fill("name", "").pressButton("Save changes", function (err) {
         if (err) return done(err);
@@ -157,6 +159,7 @@ suite('doggybag/crud', function () {
         done();
       })
     });
+    */
 
     test('update', function (done) {
       browser.fill("name", "Walter").pressButton("Save changes", function (err) {
