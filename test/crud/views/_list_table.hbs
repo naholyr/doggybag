@@ -1,0 +1,8 @@
+<ul>
+  {{#each guys}}
+  <li>
+    <a href="{{../crud_basepath}}/{{id}}">{{name}}</a>
+    [<a href="#" id="delete-{{id}}" onclick="(function(f){if(confirm('Are you sure you want to permanently delete user {{name}} ?')){f.action='{{../crud_basepath}}/delete/{{id}}';f.submit();}return false;})(document.getElementById('deleteForm'))">Delete</a>]
+  </li>
+  {{/each}}
+</ul>

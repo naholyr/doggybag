@@ -1,0 +1,33 @@
+<div class="row-fluid">
+
+  <div class="span12">
+    {{#if message}}<p class="alert alert-{{message.type}}"><strong>{{message.text}}</strong></p>{{/if}}
+
+    <h2>{{{title}}}</h2>
+
+    <form id="{{formId}}" class="form-horizontal" method="post" enctype="multipart/form-data" action="{{crud_basepath}}/{{save_url}}">
+      <fieldset>
+        {{{form}}}
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Save changes</button>
+          <a class="btn" href="{{crud_basepath}}">Cancel</a>
+        </div>
+      </fieldset>
+    </form>
+  </div>
+
+</div>
+
+{{#if clientSideValidation}}
+<script>
+  // Client-side validation
+  var form = document.getElementById('{{formId}}');
+  {{#each clientSideValidation}}
+  {{#each attributes}}
+  form.elements['{{../fieldName}}'].setAttribute('{{name}}', {{#if value}}'{{value}}'{{else}}''{{/if}});
+  {{/each}}
+  {{/each}}
+</script>
+{{/if}}
+
+{{{postEdit}}}

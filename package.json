@@ -2,13 +2,13 @@
   "author": "Dijiwan (http://dijiwan.com)",
   "name": "doggybag",
   "description": "Stuff we share across our projects. It's like a toolbox but it smells good!",
-  "version": "1.0.3-alpha",
+  "version": "1.0.4-alpha",
   "repository": {
     "type": "git",
     "url": "git://github.com/oncletom/doggybag.git"
   },
   "scripts": {
-    "test": "./node_modules/.bin/mocha --ui tdd --reporter list"
+    "test": "./node_modules/.bin/mocha --ui tdd --reporter list --ignore-leaks"
   },
   "engines": {
     "node": "~0.6.18"
@@ -18,14 +18,15 @@
     "amqp": "~0.1.3",
     "node-uuid": "~1.3.3",
     "winston": "~0.6.1",
-    "forms": "git+http://github.com/caolan/forms.git#e117c0eb58"
+    "forms": "git+http://github.com/caolan/forms.git#e117c0eb58",
+    "async": "~0.1.22"
   },
   "devDependencies": {
     "mocha": "~1.0.3",
     "expect.js": "~0.1.2",
     "sinon": "~1.3.4",
     "express": "~2.5.10",
-    "handlebars": "~1.0.5beta",
-    "zombie": "~1.3.1"
+    "zombie": "~1.3.1",
+    "hbs": "~1.0.4"
   }
 }

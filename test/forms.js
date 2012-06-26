@@ -68,7 +68,7 @@ suite('doggybag/forms', function () {
       suiteSetup(function (done) {
         app.configure(function () {
           app.set('views', __dirname + '/forms/views');
-          app.set('view engine', 'handlebars');
+          app.set('view engine', 'hbs');
           app.use(express.bodyParser());
           app.use(app.router);
         });

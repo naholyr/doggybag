@@ -1,0 +1,25 @@
+<div class="row-fluid">
+
+  <div class="span{{#if filters}}9{{else}}12{{/if}}">
+    {{#if message}}<p class="alert alert-{{message.type}}"><strong>{{message.text}}</strong></p>{{/if}}
+
+    <h2>{{{title}}} <a href="{{crud_basepath}}/create" class="pull-right btn btn-large btn-success"><i class="icon-white icon-plus-sign"></i> Create</a></h2>
+
+    {{#if count}}{{{table}}}{{else}}{{{empty}}}{{/if}}
+
+    {{#if isPaginated}}
+      <div class="pagination pull-right">
+        <ul>
+          {{#if previousPage}}<li><a href="{{crud_basepath}}?page={{previousPage}}">«</a></li>{{/if}}
+          {{#each pages}}
+            <li{{#if active}} class="active"{{/if}}><a href="{{crud_basepath}}?page={{page}}">{{page}}</a></li>
+          {{/each}}
+          {{#if nextPage}}<li><a href="{{crud_basepath}}?page={{nextPage}}">»</a></li>{{/if}}
+        </ul>
+      </div>
+    {{/if}}
+  </div>
+
+</div>
+
+<form id="deleteForm" method="post"></form>
