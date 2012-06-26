@@ -31,7 +31,7 @@ var form = forms.create({
 });
 ```
 
-See [doc/forms.md](doc/forms.md) for more complete documentation.
+See [doc/forms.md](https://github.com/Dijiwan/doggybag/tree/master/doc/forms.md) for more complete documentation.
 
 
 
@@ -48,7 +48,7 @@ require('doggybag/config').add('myApp'); // loads config/myApp.json and config/m
 var key = require('doggybag/config').myApp.get('key');
 ```
 
-See [doc/config.md](doc/config.md) for more complete documentation.
+See [doc/config.md](https://github.com/Dijiwan/doggybag/tree/master/doc/config.md) for more complete documentation.
 
 
 
@@ -67,7 +67,7 @@ var logger = require('doggybag/logger').myApp;
 logger.warn('This may not occur');
 ```
 
-See [doc/logger.md](doc/logger.md) for more complete documentation.
+See [doc/logger.md](https://github.com/Dijiwan/doggybag/tree/master/doc/logger.md) for more complete documentation.
 
 
 
@@ -88,4 +88,4 @@ var usersApp = crud.init({
 app.mount('/users', usersApp);
 ```
 
-See [doc/crud.md](doc/crud.md) for more complete documentation.
+See [doc/crud.md](https://github.com/Dijiwan/doggybag/tree/master/doc/crud.md) for more complete documentation.
