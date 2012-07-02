@@ -33,9 +33,11 @@ function initializeApp(options) {
     new Model(data).save(cb)
   };
   var updateObject = options.update || function updateObject(object, data, cb) {
-    Model.update({ '_id':object.id }, data, function (err) {
-      cb(err, object)
-    });
+    // Loop and call "save", to ensure Mongoose hooks are correctly triggered
+    for (var property in data) {
+      object[property] = data[property];
+    }
+    object.save(cb);
   };
   var removeObject = options.remove || function removeObject(object, cb) {
     object.remove(cb);
