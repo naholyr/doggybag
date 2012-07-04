@@ -44,8 +44,16 @@ suite('doggybag/middlewares', function(){
       });
     });
 
-    test('multiple proxies', function(){
+    test('multiple proxies', function(done){
+      var hostValue = '  lolcats.example.com, panda.ftw.com, joomlaroc.ks  ';
+      req.headers['x-forwarded-host'] = hostValue;
 
+      proxy(req, res, function next(){
+        expect(req.headers.host).to.be('lolcats.example.com');
+        expect(req.headers['x-forwarded-host']).to.be(hostValue);
+
+        done();
+      });
     });
   });
 
