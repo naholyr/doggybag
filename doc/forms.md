@@ -19,6 +19,7 @@ var forms = require('doggybag/forms')
 ### `render`
 
 * `twBootstrap`: a renderer for Twitter Bootstrap, with error handling
+  * Adds support for an addition option `groupClass` in fields. This class is appended to `.control-group` wrappers.
 
 ### `validators`
 
