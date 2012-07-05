@@ -17,7 +17,7 @@ var render = module.exports = {};
  */
 render.twBootstrap = function renderTwBootstrap(name, field) {
   var error = field.errorHTML(); // <p class="error_msg">…</p>
-  var html = '<div class="control-group' + (error ? ' error' : '') + '">';
+  var html = '<div class="control-group' + (field.groupClass ? (' ' + field.groupClass) : '') + (error ? ' error' : '') + '">';
   // Label
   html += '<label class="control-label"';
   if (!field.widget.type.match(/^multiple/)) {
