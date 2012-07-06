@@ -70,7 +70,7 @@ function initializeApp(options) {
     if (sort) sort.forEach(function (o) {
       q.sort.apply(q, o)
     });
-    q.limit(page * nb).run(cb);
+    q.limit(page * nb).exec(cb);
   };
   var findOne = options.findOne || function findOne(id, cb, req, res) {
     Model.findById(id, cb)
