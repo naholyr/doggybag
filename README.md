@@ -91,9 +91,11 @@ app.mount('/users', usersApp);
 See [doc/crud.md](https://github.com/Dijiwan/doggybag/tree/master/doc/crud.md) for more complete documentation.
 
 
-## Express Proxy Middleware
+## Express Middlewares
 
-This components enables your node.js app to be hosted behind a proxy and avoids
+### proxy()
+
+This component enables your node.js app to be hosted behind a proxy and avoids
 Express to become crazy when it comes to `res.redirect`.
 
 Some other middlewares exists with that stuff but usually, they are not unit-tested.
@@ -111,3 +113,15 @@ redirect protocol-compliant.
 
 **Notice**: Express 3.x will cover this feature but though, it's still okay for
 Express 2.x and below.
+
+### ensureHttps
+
+Stacking this middleware will ensure your app is always used in an HTTPS context.
+
+```javascript
+app.configure('production', function(){
+  app.use(require('doggybag/middlewares').ensureHttps());
+});
+```
+
+It's especiall useful when behind a proxy and running an HTTP node server.
