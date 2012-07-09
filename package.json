@@ -2,7 +2,7 @@
   "author": "Dijiwan (http://dijiwan.com)",
   "name": "doggybag",
   "description": "Stuff we share across our projects. It's like a toolbox but it smells good!",
-  "version": "1.0.6-alpha",
+  "version": "1.0.7-alpha",
   "repository": {
     "type": "git",
     "url": "git://github.com/oncletom/doggybag.git"
