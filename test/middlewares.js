@@ -8,15 +8,19 @@ suite('doggybag/middlewares', function(){
     res = {};
 
     req = {
+      app: {
+        settings: {
+          env: 'development'
+        }
+      },
       connection: {
-        encrypted: false
       },
       headers: {
         host: '127.0.0.1:80',
         'accept-encoding': 'gzip,deflate,sdch'
       },
       protocol: 'http',
-      url: 'http://www.example.com/faq.html'
+      url: '/faq.html'
     };
   });
 
@@ -73,8 +77,9 @@ suite('doggybag/middlewares', function(){
 
     setup(function(){
       delete req.headers['x-forwarded-proto'];
+      delete req.connection.encrypted;
+
       req.protocol = 'http';
-      req.connection.encrypted = false;
 
       res.redirect = function(url){
         throw Error('Redirection to '+url);
