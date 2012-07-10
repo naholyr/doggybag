@@ -19,14 +19,11 @@ suite('doggybag/middlewares', function(){
           env: 'testing'
         }
       },
-      connection: {
-      },
       headers: {
         host: '127.0.0.1:80',
         'accept-encoding': 'gzip,deflate,sdch'
       },
       protocol: 'http',
-      secure: false,
       url: '/faq.html'
     };
   }
@@ -87,7 +84,7 @@ suite('doggybag/middlewares', function(){
     });
 
     test('already in https', function(done){
-      req.connection.encrypted = true;
+      req.protocol = 'https';
 
       expect(function(){
         ensureHttps(req, res, function next(){
@@ -97,7 +94,7 @@ suite('doggybag/middlewares', function(){
     });
 
     test('already in https with a proxy', function(done){
-      req.secure = true;
+      req.headers['x-forwarded-proto'] = 'https';
 
       expect(function(){
         ensureHttps(req, res, function next(){
