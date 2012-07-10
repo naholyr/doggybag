@@ -79,7 +79,8 @@ suite('doggybag/middlewares', function(){
       delete req.headers['x-forwarded-proto'];
       delete req.connection.encrypted;
 
-      req.protocol = 'http';
+      req.headers.host = 'www.example.com';
+      req.secure = false;
 
       res.redirect = function(url){
         throw Error('Redirection to '+url);
@@ -103,7 +104,7 @@ suite('doggybag/middlewares', function(){
     });
 
     test('already in https with a proxy', function(done){
-      req.protocol = 'https';
+      req.secure = true;
 
       expect(function(){
         ensureHttps(req, res, function next(){
