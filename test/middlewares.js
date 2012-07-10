@@ -115,5 +115,33 @@ suite('doggybag/middlewares', function(){
 
       ensureHttps(req, res, function next(){ });
     });
+
+    test('in http, not switching because of environment', function(done){
+      ensureHttps = middlewares.ensureHttps({
+        envs: ['production']
+      });
+
+      expect(function(){
+        ensureHttps(req, res, function next(){
+          done();
+        });
+      }).not.to.throwException();
+    });
+
+    test('in http, switching because of environment', function(done){
+      ensureHttps = middlewares.ensureHttps({
+        envs: ['testing']
+      });
+
+      res.redirect = function(uri){
+        done();
+      };
+
+      expect(function(){
+        ensureHttps(req, res, function next(){
+          throw Error('Should not call next element in stack.');
+        });
+      }).not.to.throwException();
+    });
   });
 });
