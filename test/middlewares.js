@@ -4,13 +4,19 @@ var expect = require('expect.js');
 suite('doggybag/middlewares', function(){
   var res, req;
 
-  suiteSetup(function(){
-    res = {};
+  function resetResponse(){
+    res = {
+      redirect: function(url){
+        throw Error('Redirection to '+url);
+      }
+    };
+  }
 
+  function resetRequest(){
     req = {
       app: {
         settings: {
-          env: 'development'
+          env: 'testing'
         }
       },
       connection: {
@@ -20,18 +26,17 @@ suite('doggybag/middlewares', function(){
         'accept-encoding': 'gzip,deflate,sdch'
       },
       protocol: 'http',
+      secure: false,
       url: '/faq.html'
     };
-  });
+  }
+
+  setup(resetRequest);
+  setup(resetResponse);
 
 
   suite('#proxy()', function(){
     var proxy = middlewares.proxy();
-
-    setup(function(){
-      delete req.headers['x-forwarded-host'];
-      req.headers.host = '127.0.0.1:80';
-    });
 
     test('proxy available', function(){
       expect(middlewares.proxy).to.be.a('function');
@@ -75,18 +80,6 @@ suite('doggybag/middlewares', function(){
   suite('#ensureHttps()', function(){
     var ensureHttps = middlewares.ensureHttps();
 
-    setup(function(){
-      delete req.headers['x-forwarded-proto'];
-      delete req.connection.encrypted;
-
-      req.headers.host = 'www.example.com';
-      req.secure = false;
-
-      res.redirect = function(url){
-        throw Error('Redirection to '+url);
-      };
-    });
-
     test('middleware available', function(){
       expect(middlewares.ensureHttps).to.be.a('function');
       expect(middlewares.ensureHttps.replaceProtocol).to.be.a('function');
@@ -115,7 +108,7 @@ suite('doggybag/middlewares', function(){
 
     test('in http, switching to https', function(done){
       res.redirect = function(url){
-        expect(url).to.be('https://www.example.com/faq.html');
+        expect(url).to.be('https://127.0.0.1:80/faq.html');
 
         done();
       };
