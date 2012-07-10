@@ -125,3 +125,19 @@ app.configure('production', function(){
 ```
 
 It's especiall useful when behind a proxy and running an HTTP node server.
+
+Anyway, it can be problematic if you use it after the call of `app.router`.
+That's you can load the middleware in *every* environment, with filtering.
+
+```javascript
+app.configure(function(){
+  //...
+
+  app.use(require('doggybag/middlewares').ensureHttps({
+    envs: ['production']
+  }));
+
+  //...
+  app.use(app.router);
+});
+```

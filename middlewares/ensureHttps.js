@@ -9,17 +9,24 @@
  * @return {Function}
  */
 function replaceProtocol (req){
-  return req.url.replace(/^http:/i, 'https:');
+  return 'https://' + req.headers.host + req.url;
 }
 
-module.exports = function(){
+module.exports = function(options){
+  options = options || {};
+  options.envs = options.envs || [];
 
   function ensureHttpsMiddleware(req, res, next){
-    next();
-
-    if (req.protocol === 'http' && req.connection.encrypted === false){
-      res.redirect(replaceProtocol(req));
+    // Skip if it's not in the proper environment
+    if (options.envs.length && ~options.envs.indexOf(req.app.settings.env) === 0){
+      return next();
     }
+
+    if (req.secure === false && !!req.connection.encrypted === false){
+      return res.redirect(replaceProtocol(req));
+    }
+
+    next();
   }
 
   return ensureHttpsMiddleware;

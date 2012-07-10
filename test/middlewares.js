@@ -4,30 +4,39 @@ var expect = require('expect.js');
 suite('doggybag/middlewares', function(){
   var res, req;
 
-  suiteSetup(function(){
-    res = {};
+  function resetResponse(){
+    res = {
+      redirect: function(url){
+        throw Error('Redirection to '+url);
+      }
+    };
+  }
 
+  function resetRequest(){
     req = {
+      app: {
+        settings: {
+          env: 'testing'
+        }
+      },
       connection: {
-        encrypted: false
       },
       headers: {
         host: '127.0.0.1:80',
         'accept-encoding': 'gzip,deflate,sdch'
       },
       protocol: 'http',
-      url: 'http://www.example.com/faq.html'
+      secure: false,
+      url: '/faq.html'
     };
-  });
+  }
+
+  setup(resetRequest);
+  setup(resetResponse);
 
 
   suite('#proxy()', function(){
     var proxy = middlewares.proxy();
-
-    setup(function(){
-      delete req.headers['x-forwarded-host'];
-      req.headers.host = '127.0.0.1:80';
-    });
 
     test('proxy available', function(){
       expect(middlewares.proxy).to.be.a('function');
@@ -71,16 +80,6 @@ suite('doggybag/middlewares', function(){
   suite('#ensureHttps()', function(){
     var ensureHttps = middlewares.ensureHttps();
 
-    setup(function(){
-      delete req.headers['x-forwarded-proto'];
-      req.protocol = 'http';
-      req.connection.encrypted = false;
-
-      res.redirect = function(url){
-        throw Error('Redirection to '+url);
-      };
-    });
-
     test('middleware available', function(){
       expect(middlewares.ensureHttps).to.be.a('function');
       expect(middlewares.ensureHttps.replaceProtocol).to.be.a('function');
@@ -98,7 +97,7 @@ suite('doggybag/middlewares', function(){
     });
 
     test('already in https with a proxy', function(done){
-      req.protocol = 'https';
+      req.secure = true;
 
       expect(function(){
         ensureHttps(req, res, function next(){
@@ -109,12 +108,40 @@ suite('doggybag/middlewares', function(){
 
     test('in http, switching to https', function(done){
       res.redirect = function(url){
-        expect(url).to.be('https://www.example.com/faq.html');
+        expect(url).to.be('https://127.0.0.1:80/faq.html');
 
         done();
       };
 
       ensureHttps(req, res, function next(){ });
+    });
+
+    test('in http, not switching because of environment', function(done){
+      ensureHttps = middlewares.ensureHttps({
+        envs: ['production']
+      });
+
+      expect(function(){
+        ensureHttps(req, res, function next(){
+          done();
+        });
+      }).not.to.throwException();
+    });
+
+    test('in http, switching because of environment', function(done){
+      ensureHttps = middlewares.ensureHttps({
+        envs: ['testing']
+      });
+
+      res.redirect = function(uri){
+        done();
+      };
+
+      expect(function(){
+        ensureHttps(req, res, function next(){
+          throw Error('Should not call next element in stack.');
+        });
+      }).not.to.throwException();
     });
   });
 });
