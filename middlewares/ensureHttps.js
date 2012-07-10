@@ -22,7 +22,7 @@ module.exports = function(options){
       return next();
     }
 
-    if (req.secure === false && !!req.connection.encrypted === false){
+    if (req.protocol !== 'https' && req.headers['x-forwarded-proto'] !== 'https'){
       return res.redirect(replaceProtocol(req));
     }
 
