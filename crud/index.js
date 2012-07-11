@@ -463,7 +463,7 @@ var helpers = {
       } else {
         // Wrapped single value
         return function (data, fn, req, res) {
-          fn(null, String(value));
+          fn(null, value);
         };
       }
     };
