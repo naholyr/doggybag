@@ -1,12 +1,12 @@
 // Deepthroat scheduling API
 
 var uuid = require('node-uuid');
-var winston = require('winston');
 
 module.exports = function Scheduler(options, dependencies) {
   // Injected dependencies
   dependencies = dependencies || {};
   var Client = dependencies.AMQPJobResultClient || require('./AMQPJobResultClient');
+  var logger = dependencies.logger || require('winston');
 
   // Options
   options = Client.merge({
@@ -21,12 +21,15 @@ module.exports = function Scheduler(options, dependencies) {
   // Exposed scheduler
   var e = new (Client.EventEmitter)();
 
+  // Expose logger
+  e.logger = logger;
+
   // Expose internal client
   e.client = c;
 
   // Spread error
   c.on('error', function (err) {
-    winston.error(err);
+    e.logger.error(err);
     e.emit('error', err);
   });
 
@@ -37,7 +40,7 @@ module.exports = function Scheduler(options, dependencies) {
 
   // Receive result
   c.on('read', function (message, headers, info, ack, m) {
-    winston.debug('Received result', { "result(bytes)":JSON.stringify(message).length });
+    e.logger.debug('Received result', { "result(bytes)":JSON.stringify(message).length });
     e.emit('result', message, ack, m.reject.bind(m));
   });
 
@@ -51,7 +54,7 @@ module.exports = function Scheduler(options, dependencies) {
       "jobType":jobType,
       "data":data
     };
-    winston.debug('Sending job...', { "jobId":job.jobId });
+    e.logger.debug('Sending job...', { "jobId":job.jobId });
     return c.write(job, jobType, function () {
       e.emit('job', job);
       done(job);
@@ -60,7 +63,7 @@ module.exports = function Scheduler(options, dependencies) {
 
   // Close connection
   e.end = function (done) {
-    winston.debug('Closing scheduler');
+    e.logger.debug('Closing scheduler');
     c.end(done);
   };
 

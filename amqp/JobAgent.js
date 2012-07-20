@@ -1,6 +1,5 @@
 "use strict";
 
-var winston = require('winston');
 var path = require('path');
 
 var Client = require('./AMQPJobResultClient');
@@ -9,6 +8,7 @@ function Agent(jobType, options, dependencies) {
   // Injected dependencies
   dependencies = dependencies || {};
   var Client = dependencies.AMQPJobResultClient || require('./AMQPJobResultClient');
+  var logger = dependencies.logger || require('winston');
 
   // Options
   options = Client.merge({
@@ -29,6 +29,9 @@ function Agent(jobType, options, dependencies) {
   // Exposed agent
   var e = new (Client.EventEmitter)();
 
+  // Expose logger
+  e.logger = logger;
+
   // Expose options
   e.options = options;
 
@@ -37,7 +40,7 @@ function Agent(jobType, options, dependencies) {
 
   // Spread error
   c.on('error', function (err) {
-    winston.error(err);
+    e.logger.error(err);
     e.emit('error', err);
   });
 
@@ -48,7 +51,7 @@ function Agent(jobType, options, dependencies) {
 
   // Receive job
   c.on('read', function (message, headers, info, ack, messageInstance) {
-    winston.debug('Receiving job');
+    e.logger.debug('Receiving job');
 
     var isAck = false;
     var isResponded = false;
@@ -95,12 +98,12 @@ function Agent(jobType, options, dependencies) {
           // Note that we re-publish instead of reject + requeue, because reject will not place the message
           // at bottom of the queue as we would expect it, plus we cannot modify message's payload and woudn't
           // be able to increment retry counter !
-          winston.warn('Message republished for later retry', { "delay":timeout, "jobId":message.jobId, "result":JSON.stringify(result) });
+          e.logger.warn('Message republished for later retry', { "delay":timeout, "jobId":message.jobId, "result":JSON.stringify(result) });
           // Note that we could ACK right now, but if we do and the agent is killed in the meantime, the message
           // will be lost forever: never re-published, already acked = lost.
           setTimeout(function () {
             c.write(message, c.options.readRoute, function () {
-              winston.debug('Message has been republished, ack now', { "delay":timeout, "jobId":message.jobId });
+              e.logger.debug('Message has been republished, ack now', { "delay":timeout, "jobId":message.jobId });
               ack();
             }, c.options.readQueue);
           }, timeout);
@@ -108,7 +111,7 @@ function Agent(jobType, options, dependencies) {
         }
         // 2. The message has reached the retry limit…
         // … then it's simply reject as dead-letter
-        winston.warn('Dead-letter', { "jobId":message.jobId });
+        e.logger.warn('Dead-letter', { "jobId":message.jobId });
         messageInstance.reject(false);
       }
     }
@@ -136,20 +139,20 @@ function Agent(jobType, options, dependencies) {
         "jobType":message.jobType || jobType,
         "data":result
       };
-      winston.debug('Sending result', { "result(bytes)":JSON.stringify(result).length });
+      e.logger.debug('Sending result', { "result(bytes)":JSON.stringify(result).length });
       return c.write(result, result.jobType, function () {
         e.emit('result', result, job);
       });
     }
 
     // Emit job event for each received message on this route
-    winston.debug('Received job', { "jobId":job.jobId });
+    e.logger.debug('Received job', { "jobId":job.jobId });
     e.emit('job', job, doRespond, doAck);
   });
 
   // Close connection
   e.end = function (done) {
-    winston.debug('Closing agent...');
+    e.logger.debug('Closing agent...');
     c.end(done);
   };
 

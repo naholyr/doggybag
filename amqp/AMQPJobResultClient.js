@@ -1,7 +1,5 @@
 var EventEmitter = require('events').EventEmitter;
 
-var winston = require('winston');
-
 
 // shallow merge objects
 function merge(to, from, keys) {
@@ -27,6 +25,7 @@ module.exports = function (options, dependencies) {
   // Injected dependencies
   dependencies = dependencies || {};
   var amqp = dependencies.amqp || require('amqp');
+  var logger = dependencies.logger || require('winston');
 
   // Options
   options = merge({ "exchange":"amq.topic", "autoReconnect":true }, options);
@@ -38,6 +37,9 @@ module.exports = function (options, dependencies) {
   // * error: when a connection error occurs
   // * read: when a result is read
   var e = new EventEmitter();
+
+  // Expose logger
+  e.logger = logger;
 
   // Expose options
   e.options = options;
@@ -90,7 +92,7 @@ module.exports = function (options, dependencies) {
       q.bind(options.exchange, queuePattern);
       // Finally, subscribe to this queue with configured QOS
       q.subscribe({ "ack":true, "prefetchCount":prefetchCount }, function (message, headers, info, m) {
-        winston.debug('Received a message');
+        e.logger.debug('Received a message');
         e.emit('read', message, headers, info, function ack() {
           m.acknowledge()
         }, m);
