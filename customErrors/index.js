@@ -40,6 +40,6 @@ module.exports = {
   HTTPResponseError:   HTTPResponseError,
   NotFoundError:       NotFoundError,
   InternalServerError: InternalServerError,
-  Demo:                DemoError
+  DemoError:                DemoError
 };
 
