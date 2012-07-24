@@ -206,6 +206,25 @@ suite('doggybag/crud', function () {
       });
     });
 
+    test('field with quotes', function (done) {
+      browser.visit('http://127.0.0.1:' + app.address().port + '/guys', function (err) {
+        if (err) return done(err);
+        expect(browser.success).to.be.ok();
+        browser.clickLink('Create', function (err) {
+          if (err) return done(err);
+          expect(browser.success).to.be.ok();
+          browser.fill("name", 'Arnold "the big"').pressButton("Save changes", function (err) {
+            if (err) return done(err);
+            expect(browser.success).to.be.ok();
+            expect(guys).to.have.length(4);
+            expect(guys[3].name).to.equal('Arnold "the big"');
+            expect(browser.document.querySelector('input[name="name"]').value).to.equal(guys[3].name);
+            done();
+          });
+        });
+      });
+    });
+
   });
 
 });
