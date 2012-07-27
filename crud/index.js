@@ -206,6 +206,18 @@ function initializeApp(options) {
   }
 
   /**
+   * Escape field's value: when a string, we transform special characters to entities
+   *
+   * @param value
+   */
+  function escapeFieldValue(value) {
+    if (typeof value === 'string') {
+      value = value.replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+    return value;
+  }
+
+  /**
    * Create edition form
    *
    * @type {Middleware}
@@ -236,7 +248,7 @@ function initializeApp(options) {
           // instead, we change field's default value
           Object.keys(values).forEach(function (k) {
             if (typeof values[k] !== 'undefined' && form.fields[k]) {
-              form.fields[k].value = values[k];
+              form.fields[k].value = escapeFieldValue(values[k]);
             }
           });
         }
