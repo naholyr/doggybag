@@ -21,7 +21,8 @@ suite('doggybag/middlewares', function(){
       },
       headers: {
         host: '127.0.0.1:80',
-        'accept-encoding': 'gzip,deflate,sdch'
+        'accept-encoding': 'gzip,deflate,sdch',
+        'accept-language': 'da, en-gb;q=0.8, en;q=0.7'
       },
       protocol: 'http',
       url: '/faq.html'
@@ -139,6 +140,83 @@ suite('doggybag/middlewares', function(){
           throw Error('Should not call next element in stack.');
         });
       }).not.to.throwException();
+    });
+  });
+
+  suite('#locale()', function(){
+    var locale = middlewares.locale(['fr', 'en', 'ja']);
+
+    test('No Accept-Language headers', function(done){
+      req.headers = {};
+
+      locale(req, res, function next(){
+        expect(req.locale).to.be('en');
+
+        done();
+      });
+    });
+
+    test('One matching string', function(){
+      req.headers['accept-language'] = 'en';
+
+      locale(req, res, function next(){
+        expect(req.locale).to.be('en');
+
+        done();
+      });
+    });
+
+    test('One matching string (underscore)', function(){
+      locale = middlewares.locale(['fr', 'en_US', 'ja']);
+
+      locale(req, res, function next(){
+        expect(req.locale).to.be('en_US');
+
+        done();
+      });
+    });
+
+    test('One matching string (dash)', function(){
+      locale = middlewares.locale(['fr-fr', 'en', 'ja']);
+
+      locale(req, res, function next(){
+        expect(req.locale).to.be('fr-fr');
+
+        done();
+      });
+    });
+
+    test('One matching partial string (underscore)', function(){
+      req.headers['accept-language'] = 'en_US';
+
+      locale(req, res, function next(){
+        expect(req.locale).to.be('en');
+
+        done();
+      });
+    });
+
+    test('One matching partial string (dash)', function(){
+      req.headers['accept-language'] = 'fr-fr';
+
+      locale(req, res, function next(){
+        expect(req.locale).to.be('fr');
+
+        done();
+      });
+    });
+
+    test('Fallback language', function(){
+      locale = middlewares.locale({
+        acceptedLocales: ['ko', 'eu', 'ja'],
+        fallbackLocale: 'tlh'
+      });
+
+      locale(req, res, function next(){
+        expect(req.locale).to.be('tlh');
+
+        done();
+      });
     });
   });
 });
