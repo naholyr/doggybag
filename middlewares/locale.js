@@ -23,18 +23,17 @@ module.exports = function(options){
     }
 
     // No header? Use the fallback
-    if (!req.headers['Accept-Language']){
+    if (!req.header('Accept-Language')){
       req.locale = options.fallbackLocale;
       return next();
     }
 
     // Otherwise set the default and autodetect
     req.locale = options.fallbackLocale;
+    req.header('Accept-Language').split(',').some(function(locale){
+      locale = locale.split(';')[0].trim();
 
-    req.headers['Accept-Language'].split(',').some(function(locale){
-      locale = value.split(';')[0].trim();
-
-      if (~options.acceptedLocales.inArray(locale) || ~options.acceptedLocales.inArray(locale.split(/[\-_]/)[0])){
+      if (~options.acceptedLocales.indexOf(locale) || ~options.acceptedLocales.indexOf(locale.split(/[\-_]/)[0])){
         req.locale = locale;
 
         return true;

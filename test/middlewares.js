@@ -19,6 +19,21 @@ suite('doggybag/middlewares', function(){
           env: 'testing'
         }
       },
+      header: function getRequestHeader(key){
+        var self = this;
+        var headerValue;
+
+        key = key.toLowerCase();
+
+        Object.keys(self.headers).some(function(headerKey){
+          if (headerKey.toLowerCase() === key){
+            headerValue = self.headers[headerKey];
+            return true;
+          }
+        });
+
+        return headerValue;
+      },
       headers: {
         host: '127.0.0.1:80',
         'accept-encoding': 'gzip,deflate,sdch',
