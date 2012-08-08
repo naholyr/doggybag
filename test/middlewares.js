@@ -22,7 +22,7 @@ suite('doggybag/middlewares', function(){
       headers: {
         host: '127.0.0.1:80',
         'accept-encoding': 'gzip,deflate,sdch',
-        'accept-language': 'da, en-gb;q=0.8, en;q=0.7'
+        'accept-language': 'da, en;q=0.7, cs-cz; 0.6, yi_Hebr, fr'
       },
       protocol: 'http',
       url: '/faq.html'
@@ -157,50 +157,50 @@ suite('doggybag/middlewares', function(){
     });
 
     test('One matching string', function(done){
-      req.headers['accept-language'] = 'en';
+      req.headers['accept-language'] = 'da';
 
       locale(req, res, function next(){
-        expect(req.locale).to.be('en');
+        expect(req.locale).to.be('da');
 
         done();
       });
     });
 
     test('One matching string (underscore)', function(done){
-      var locale = middlewares.locale(['fr', 'en_US', 'ja']);
+      req.headers['accept-language'] = 'yi_Hebr';
 
       locale(req, res, function next(){
-        expect(req.locale).to.be('en_US');
+        expect(req.locale).to.be('yi_Hebr');
 
         done();
       });
     });
 
     test('One matching string (dash)', function(done){
-      var locale = middlewares.locale(['fr-fr', 'en', 'ja']);
+      req.headers['accept-language'] = 'cs-cz';
 
       locale(req, res, function next(){
-        expect(req.locale).to.be('fr-fr');
+        expect(req.locale).to.be('cs-cz');
 
         done();
       });
     });
 
     test('One matching partial string (underscore)', function(done){
-      req.headers['accept-language'] = 'en_US';
+      req.headers['accept-language'] = 'yi_Hebr';
 
       locale(req, res, function next(){
-        expect(req.locale).to.be('en');
+        expect(req.locale).to.be('yi');
 
         done();
       });
     });
 
     test('One matching partial string (dash)', function(done){
-      req.headers['accept-language'] = 'fr-fr';
+      req.headers['accept-language'] = 'cs-cz';
 
       locale(req, res, function next(){
-        expect(req.locale).to.be('fr');
+        expect(req.locale).to.be('cs');
 
         done();
       });
