@@ -159,7 +159,7 @@ suite('doggybag/middlewares', function(){
   });
 
   suite('#locale()', function(){
-    var locale = middlewares.locale(['fr', 'en', 'da']);
+    var locale = middlewares.locale(['fr', 'en', 'da', 'yi_hebr', 'cs-CZ']);
 
     test('No Accept-Language headers', function(done){
       req.headers = {};
@@ -185,7 +185,7 @@ suite('doggybag/middlewares', function(){
       req.headers['accept-language'] = 'yi_Hebr';
 
       locale(req, res, function next(){
-        expect(req.locale).to.be('yi_Hebr');
+        expect(req.locale).to.be('yi_hebr');
 
         done();
       });
