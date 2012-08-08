@@ -19,9 +19,25 @@ suite('doggybag/middlewares', function(){
           env: 'testing'
         }
       },
+      header: function getRequestHeader(key){
+        var self = this;
+        var headerValue;
+
+        key = key.toLowerCase();
+
+        Object.keys(self.headers).some(function(headerKey){
+          if (headerKey.toLowerCase() === key){
+            headerValue = self.headers[headerKey];
+            return true;
+          }
+        });
+
+        return headerValue;
+      },
       headers: {
         host: '127.0.0.1:80',
-        'accept-encoding': 'gzip,deflate,sdch'
+        'accept-encoding': 'gzip,deflate,sdch',
+        'accept-language': 'da, en;q=0.7, cs-cz; 0.6, yi_Hebr, fr'
       },
       protocol: 'http',
       url: '/faq.html'
@@ -139,6 +155,85 @@ suite('doggybag/middlewares', function(){
           throw Error('Should not call next element in stack.');
         });
       }).not.to.throwException();
+    });
+  });
+
+  suite('#locale()', function(){
+    var locale = middlewares.locale(['fr', 'en', 'da', 'yi_hebr', 'cs-CZ']);
+
+    test('No Accept-Language headers', function(done){
+      req.headers = {};
+
+      locale(req, res, function next(){
+        expect(req.locale).to.be('en');
+
+        done();
+      });
+    });
+
+    test('One matching string', function(done){
+      req.headers['accept-language'] = 'da';
+
+      locale(req, res, function next(){
+        expect(req.locale).to.be('da');
+
+        done();
+      });
+    });
+
+    test('One matching string (underscore)', function(done){
+      req.headers['accept-language'] = 'yi_Hebr';
+
+      locale(req, res, function next(){
+        expect(req.locale).to.be('yi_hebr');
+
+        done();
+      });
+    });
+
+    test('One matching string (dash)', function(done){
+      req.headers['accept-language'] = 'cs-cz';
+
+      locale(req, res, function next(){
+        expect(req.locale).to.be('cs-cz');
+
+        done();
+      });
+    });
+
+    test('One matching partial string (underscore)', function(done){
+      var locale = middlewares.locale(['fr', 'en', 'da', 'yi', 'cs']);
+      req.headers['accept-language'] = 'yi_Hebr';
+
+      locale(req, res, function next(){
+        expect(req.locale).to.be('yi');
+
+        done();
+      });
+    });
+
+    test('One matching partial string (dash)', function(done){
+      var locale = middlewares.locale(['fr', 'en', 'da', 'yi', 'cs']);
+      req.headers['accept-language'] = 'cs-cz';
+
+      locale(req, res, function next(){
+        expect(req.locale).to.be('cs');
+
+        done();
+      });
+    });
+
+    test('Fallback language', function(done){
+      var locale = middlewares.locale({
+        acceptedLocales: ['ko', 'eu', 'ja'],
+        fallbackLocale: 'tlh'
+      });
+
+      locale(req, res, function next(){
+        expect(req.locale).to.be('tlh');
+
+        done();
+      });
     });
   });
 });

@@ -141,3 +141,29 @@ app.configure(function(){
   app.use(app.router);
 });
 ```
+
+### locale
+
+Guessing locale upon browser language can be tricky. Some use case encountered:
+* no `Accept-Language` (especially true when using PhantomJS)
+* aggressive value (only `fr-fr` or `en_US` with Safari)
+* with or without priority
+
+This middleware's goal is autodetection without breaking your app.
+
+```javascript
+app.configure(function(){
+
+  app.use(require('doggybag/middlewares').locale(['fr', 'ja', 'en']));
+
+  //app.locale is then useable, and dynamically configured upon browser request
+});
+```
+
+```bash
+$ curl -H 'Accept-Language: fr-fr' http://yourexpress.app
+--> 'fr' locale will be used
+```
+
+**Notice**: to avoid greedy lookup, the `req.locale` will always be lowercase.
+Think about it when dealing with its value in your apps!
