@@ -16,6 +16,10 @@ module.exports = function(options){
   options.acceptedLocales = options.acceptedLocales || [];
   options.fallbackLocale = options.fallbackLocale || 'en';
 
+  options.acceptedLocales = options.acceptedLocales.map(function(locale){
+    return locale.toLowerCase();
+  });
+
   return function localeMiddleware(req, res, next){
     // Already set? Skip
     if (req.locale){
@@ -31,9 +35,19 @@ module.exports = function(options){
     // Otherwise set the default and autodetect
     req.locale = options.fallbackLocale;
     req.header('Accept-Language').split(',').some(function(locale){
-      locale = locale.split(';')[0].trim();
+      locale = locale.split(';')[0].trim().toLowerCase();
 
-      if (~options.acceptedLocales.indexOf(locale) || ~options.acceptedLocales.indexOf(locale.split(/[\-_]/)[0])){
+      // Basic match
+      if (~options.acceptedLocales.indexOf(locale)){
+        req.locale = locale;
+
+        return true;
+      }
+
+      // Trying to detect if the provided long locale matches an accepted short one
+      locale = locale.split(/[\-_]/)[0];
+
+      if (~options.acceptedLocales.indexOf(locale)){
         req.locale = locale;
 
         return true;
