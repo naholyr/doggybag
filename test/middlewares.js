@@ -156,7 +156,7 @@ suite('doggybag/middlewares', function(){
       });
     });
 
-    test('One matching string', function(){
+    test('One matching string', function(done){
       req.headers['accept-language'] = 'en';
 
       locale(req, res, function next(){
@@ -166,7 +166,7 @@ suite('doggybag/middlewares', function(){
       });
     });
 
-    test('One matching string (underscore)', function(){
+    test('One matching string (underscore)', function(done){
       locale = middlewares.locale(['fr', 'en_US', 'ja']);
 
       locale(req, res, function next(){
@@ -176,7 +176,7 @@ suite('doggybag/middlewares', function(){
       });
     });
 
-    test('One matching string (dash)', function(){
+    test('One matching string (dash)', function(done){
       locale = middlewares.locale(['fr-fr', 'en', 'ja']);
 
       locale(req, res, function next(){
@@ -186,7 +186,7 @@ suite('doggybag/middlewares', function(){
       });
     });
 
-    test('One matching partial string (underscore)', function(){
+    test('One matching partial string (underscore)', function(done){
       req.headers['accept-language'] = 'en_US';
 
       locale(req, res, function next(){
@@ -196,7 +196,7 @@ suite('doggybag/middlewares', function(){
       });
     });
 
-    test('One matching partial string (dash)', function(){
+    test('One matching partial string (dash)', function(done){
       req.headers['accept-language'] = 'fr-fr';
 
       locale(req, res, function next(){
@@ -206,7 +206,7 @@ suite('doggybag/middlewares', function(){
       });
     });
 
-    test('Fallback language', function(){
+    test('Fallback language', function(done){
       locale = middlewares.locale({
         acceptedLocales: ['ko', 'eu', 'ja'],
         fallbackLocale: 'tlh'
