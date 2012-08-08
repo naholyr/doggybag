@@ -202,6 +202,7 @@ suite('doggybag/middlewares', function(){
     });
 
     test('One matching partial string (underscore)', function(done){
+      var locale = middlewares.locale(['fr', 'en', 'da', 'yi', 'cs']);
       req.headers['accept-language'] = 'yi_Hebr';
 
       locale(req, res, function next(){
@@ -212,6 +213,7 @@ suite('doggybag/middlewares', function(){
     });
 
     test('One matching partial string (dash)', function(done){
+      var locale = middlewares.locale(['fr', 'en', 'da', 'yi', 'cs']);
       req.headers['accept-language'] = 'cs-cz';
 
       locale(req, res, function next(){
