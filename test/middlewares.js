@@ -167,7 +167,7 @@ suite('doggybag/middlewares', function(){
     });
 
     test('One matching string (underscore)', function(done){
-      locale = middlewares.locale(['fr', 'en_US', 'ja']);
+      var locale = middlewares.locale(['fr', 'en_US', 'ja']);
 
       locale(req, res, function next(){
         expect(req.locale).to.be('en_US');
@@ -177,7 +177,7 @@ suite('doggybag/middlewares', function(){
     });
 
     test('One matching string (dash)', function(done){
-      locale = middlewares.locale(['fr-fr', 'en', 'ja']);
+      var locale = middlewares.locale(['fr-fr', 'en', 'ja']);
 
       locale(req, res, function next(){
         expect(req.locale).to.be('fr-fr');
@@ -207,7 +207,7 @@ suite('doggybag/middlewares', function(){
     });
 
     test('Fallback language', function(done){
-      locale = middlewares.locale({
+      var locale = middlewares.locale({
         acceptedLocales: ['ko', 'eu', 'ja'],
         fallbackLocale: 'tlh'
       });
