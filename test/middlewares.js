@@ -159,7 +159,7 @@ suite('doggybag/middlewares', function(){
   });
 
   suite('#locale()', function(){
-    var locale = middlewares.locale(['fr', 'en', 'ja']);
+    var locale = middlewares.locale(['fr', 'en', 'da']);
 
     test('No Accept-Language headers', function(done){
       req.headers = {};
