@@ -292,6 +292,9 @@ function initializeApp(options) {
           // Last case: we assign corresponding model field, only if value has not been defined in "formValues"
           if (typeof values[k] === 'undefined' && typeof req[viewKey][k] !== 'undefined') {
             newValues[k] = req[viewKey][k];
+          } else if (typeof values[k] !== 'undefined') {
+            // or take value directly from "formValues"
+            newValues[k] = values[k];
           }
         });
         // Remove falsey callbacks before passing to async.parallel
