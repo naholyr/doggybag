@@ -12,16 +12,24 @@ function Agent(jobType, options, dependencies) {
 
   // Options
   options = Client.merge({
-    "exchange":"deepthroat",
-    "readQueue":"jobs",
-    "readRoute":jobType,
-    "writeQueue":"results",
+    "exchange": "deepthroat",
+    "jobsQueue": "jobs",
+    "resultsQueue": "results",
+    "readRoute": jobType,
     "maxRetries":3,
     "retryTimeout":30000
     // "modulesPath": "/path/to/agents"
     // "modulePath": "/path/to/agents/myAgent.js"
     // "module": require('myAgent')
   }, options);
+
+  // Detailed queues (read from jobs, write to results)
+  if (!options.readQueue) {
+    options.readQueue = options.jobsQueue;
+  }
+  if (!options.writeQueue) {
+    options.writeQueue = options.resultsQueue;
+  }
 
   // Internal client
   var c = Client(options);
