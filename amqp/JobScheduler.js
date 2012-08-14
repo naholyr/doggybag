@@ -10,10 +10,18 @@ module.exports = function Scheduler(options, dependencies) {
 
   // Options
   options = Client.merge({
-    "exchange":"deepthroat",
-    "readQueue":"results",
-    "writeQueue":"jobs"
+    "exchange": "deepthroat",
+    "jobsQueue": "jobs",
+    "resultsQueue": "results"
   }, options);
+
+  // Detailed queues (read from results, write to jobs)
+  if (!options.readQueue) {
+    options.readQueue = options.resultsQueue;
+  }
+  if (!options.writeQueue) {
+    options.writeQueue = options.jobsQueue;
+  }
 
   // Internal client
   var c = Client(options);

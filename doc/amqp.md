@@ -102,7 +102,8 @@ scheduler.on('result', function(result, ack, reject) {
   } else {
     console.log('ERROR', result.data.error, result.data.data); // print error code and more info
   }
-  // Always ack or reject the message, or it will stay in the queue!
+  // IMPORTANT! always ack or reject the message, or it will stay in the queue and you will receive them
+  // each time you restart. But worse: you will not receive any new result until restarted!
   ack();
 });
 ```
@@ -124,6 +125,11 @@ practice: always specify your exchange.
 * `autoReconnect`: experimental option that enables automatic re-connection to AMQP server when it dropped. Not heavily
 tested but no drawback has been detected. Enabled by default.
 * `host`, `port`, `login`, `password`, `vhost`: connection information.
+* `resultsQueue`: queue where results will be written (read by scheduler, published by agent).
+* `jobsQueue`: queue where jobs will be written (read by agent, published by scheduler).
+
+Following options are kept for backward compatibility but you shouldn't use them anymore:
+
 * `writeQueue`: queue where data will be written (default is "results" for agents, "jobs" for scheduler).
 * `readQueue`: queue where data will be read ("results" for scheduler, "jobs" for agents).
 * `readRoute`: additional information for reading specific data, which will allow agents to read only jobs of their type
