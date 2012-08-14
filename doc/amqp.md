@@ -210,3 +210,28 @@ Mandatory attributes: `success` or `error`, and `data`.
 
 * `result` when a result is sent (useful for logging purpose, parameters = result, job).
 * `job` when a job is received (parameters = job, respond, ack; call `respond(err, data)` to send result).
+
+## Replace logger
+
+Logger must have following methods (`winston` is used internally):
+* `error(message, moreInfo)`
+* `debug(message, moreInfo)`
+* `warn(message, moreInfo)`
+
+### Using dependency injection
+
+You can replace some internal components by injecting dependencies "manually". Typically you will want to replace the
+logger:
+
+```javascript
+amqp.newAgent(jobType, options, cb, {logger: myLogger});
+amqp.newScheduler(options, cb, {logger: myLogger});
+```
+
+You can replace other internal components, but these are far from common cases.
+
+### Using `logger` attribute
+
+The logger is exposed as an attribute of agent or scheduler (they're both the same instance).
+
+It's an instance of `winston` module, you can just configure it your way, or override some of its methods.
