@@ -3,6 +3,15 @@
 An wrapper that will automatically configure several `winston` loggers using
 your configuration (works very well with `doggybag/config`).
 
+## Installation
+
+Don't forget to `npm install --save winston` to add required dependencies to your project.
+
+### Why not including `winston` in `doggybag` ?
+
+Because as third-party transports all call `require('winston')` to extend it, therefore letting you include `winston`
+in your own `node_modules` directory will avoid many complicated manipulations to add transports.
+
 ## Usage
 
 ```javascript
@@ -19,7 +28,8 @@ logger.warn('This may not occur');
 
 `add()` takes two parameters:
 
-* The name of the logger: This will be used to retrieve the logger with `require('doggybag/logger').yourLoggerName`. If you don't give one, "default" will be used.
+* The name of the logger: This will be used to retrieve the logger with `require('doggybag/logger').yourLoggerName`.
+If you don't give one, "default" will be used.
 * The options for your logger. Check `winston`'s per-transport configuration for this.
 
 Sample usage:
@@ -38,6 +48,21 @@ logger.add('default', {
 
 logger.default.debug('Hello, world'); // Should not be visible
 logger.default.warn('World ? Hello ?'); // Should be visible
+```
+
+### Enabling third-party transports
+
+Example for Loggly:
+
+```javascript
+require('winston-loggly');
+
+// That's all folks, you can now configure your logger
+logger.add('events', {
+  loggly: {
+    // …
+  }
+});
 ```
 
 ### Initializing multiple loggers
