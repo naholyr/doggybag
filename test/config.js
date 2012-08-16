@@ -125,4 +125,28 @@ suite('doggybag/config', function () {
 
   });
 
+  suite('- user-specific configuration', function () {
+
+    var provider;
+
+    suiteSetup(function () {
+      provider = config.add('sample', {"dir":dir, "user":"username"});
+    });
+
+    test('has loaded sample.json', function () {
+      expect(provider.get('whoami')).to.equal('sample');
+      expect(provider.get('default')).to.be(true);
+    });
+    test('has loaded sample.test.json', function () {
+      expect(provider.get('env')).to.equal('test');
+    });
+    test('has loaded sample.username.json', function () {
+      expect(provider.get('user')).to.equal('username');
+    });
+    test('has loaded sample.username.test.json', function () {
+      expect(provider.get('env_and_user')).to.equal(true);
+    });
+
+  });
+
 });

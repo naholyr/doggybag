@@ -41,11 +41,17 @@ config.add = function add(name, options) {
   var files = options.files || options.file;
   if (typeof files === 'string') {
     files = [ files ];
+  } else if (!options.type && options.suffix) {
+    // … or depend on provided suffix
+    files = [ name + ".json", name + "." + options.suffix + ".json" ];
   } else if (!options.type) {
-    // … or depend on context: env, suffix, and config directory
+    // … or depend on context: env, user
+    files = [ name + ".json" ];
     var env = (options.env || process.env.NODE_ENV).toLowerCase();
-    var suffix = options.suffix || env;
-    files = [ name + ".json", name + "." + suffix + ".json" ];
+    var user = (options.user || process.env.USER);
+    if (env) files.push(name + "." + env + ".json");
+    if (user && user !== env) files.push(name + "." + user + ".json");
+    if (user && env) files.push(name + "." + user + "." + env + ".json");
   }
 
   // Add config provider depending on configuration
