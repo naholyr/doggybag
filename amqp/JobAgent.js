@@ -16,8 +16,8 @@ function Agent(jobType, options, dependencies) {
     "jobsQueue": "jobs",
     "resultsQueue": "results",
     "readRoute": jobType,
-    "maxRetries":3,
-    "retryTimeout":30000
+    "maxRetries": 3,
+    "retryTimeout": 30000
     // "modulesPath": "/path/to/agents"
     // "modulePath": "/path/to/agents/myAgent.js"
     // "module": require('myAgent')
@@ -47,27 +47,27 @@ function Agent(jobType, options, dependencies) {
   e.client = c;
 
   // Spread error
-  c.on('error', function (err) {
+  c.on('error', function(err) {
     e.logger.error(err);
     e.emit('error', err);
   });
 
   // Spread ready
-  c.on('ready', function () {
+  c.on('ready', function() {
     e.emit('ready')
   });
 
   // Receive job
-  c.on('read', function (message, headers, info, ack, messageInstance) {
+  c.on('read', function(message, headers, info, ack, messageInstance) {
     e.logger.debug('Receiving job');
 
     var isAck = false;
     var isResponded = false;
     var job = {
-      "at":message.at,
-      "jobId":message.jobId,
-      "jobType":message.jobType || jobType,
-      "data":message.data
+      "at": message.at,
+      "jobId": message.jobId,
+      "jobType": message.jobType || jobType,
+      "data": message.data
     };
     // Acknowledge message (you may want to acknowledge before sending result)
     function doAck() {
@@ -106,12 +106,12 @@ function Agent(jobType, options, dependencies) {
           // Note that we re-publish instead of reject + requeue, because reject will not place the message
           // at bottom of the queue as we would expect it, plus we cannot modify message's payload and woudn't
           // be able to increment retry counter !
-          e.logger.warn('Message republished for later retry', { "delay":timeout, "jobId":message.jobId, "result":JSON.stringify(result) });
+          e.logger.warn('Message republished for later retry', { "delay": timeout, "jobId": message.jobId, "result": JSON.stringify(result) });
           // Note that we could ACK right now, but if we do and the agent is killed in the meantime, the message
           // will be lost forever: never re-published, already acked = lost.
-          setTimeout(function () {
-            c.write(message, c.options.readRoute, function () {
-              e.logger.debug('Message has been republished, ack now', { "delay":timeout, "jobId":message.jobId });
+          setTimeout(function() {
+            c.write(message, c.options.readRoute, function() {
+              e.logger.debug('Message has been republished, ack now', { "delay": timeout, "jobId": message.jobId });
               ack();
             }, c.options.readQueue);
           }, timeout);
@@ -119,7 +119,7 @@ function Agent(jobType, options, dependencies) {
         }
         // 2. The message has reached the retry limit…
         // … then it's simply reject as dead-letter
-        e.logger.warn('Dead-letter', { "jobId":message.jobId });
+        e.logger.warn('Dead-letter', { "jobId": message.jobId });
         messageInstance.reject(false);
       }
     }
@@ -141,25 +141,25 @@ function Agent(jobType, options, dependencies) {
       }
       // Write response to results queue
       var result = {
-        "at":Date.now(),
-        "jobAt":message.at,
-        "jobId":message.jobId,
-        "jobType":message.jobType || jobType,
-        "data":result
+        "at": Date.now(),
+        "jobAt": message.at,
+        "jobId": message.jobId,
+        "jobType": message.jobType || jobType,
+        "data": result
       };
-      e.logger.debug('Sending result', { "result(bytes)":JSON.stringify(result).length });
-      return c.write(result, result.jobType, function () {
+      e.logger.debug('Sending result', { "result(bytes)": JSON.stringify(result).length });
+      return c.write(result, result.jobType, function() {
         e.emit('result', result, job);
       });
     }
 
     // Emit job event for each received message on this route
-    e.logger.debug('Received job', { "jobId":job.jobId });
+    e.logger.debug('Received job', { "jobId": job.jobId });
     e.emit('job', job, doRespond, doAck);
   });
 
   // Close connection
-  e.end = function (done) {
+  e.end = function(done) {
     e.logger.debug('Closing agent...');
     c.end(done);
   };
@@ -170,12 +170,12 @@ function Agent(jobType, options, dependencies) {
   return e;
 }
 
-module.exports = function (jobType, options, fn, dependencies) {
+module.exports = function(jobType, options, fn, dependencies) {
   options = options || {};
 
   // When finished
   var done = function done(err) {
-    process.nextTick(function () {
+    process.nextTick(function() {
       if (fn) fn(err, agent);
     });
     return agent;
@@ -199,18 +199,28 @@ module.exports = function (jobType, options, fn, dependencies) {
   var agent = Agent(jobType, options, dependencies);
 
   // When a job data has been validated
-  var onValidated = function onValidate(jobData, respond) {
-    process.nextTick(function () {
+  var onValidated = function onValidate(jobData, jobId, jobAt, respond) {
+    process.nextTick(function() {
       try {
-        agentModule.run(jobData, function (err, result) {
+        var done = function(err, result) {
           if (err) {
-            respond({ "error":"JOB_FAILED", "data":err.stack || err.toString(), "partialResult":result }, err.reject ? err.requeue : null, err.reject && (err.requeueDelay || options.requeueDelay));
+            respond({ "error": "JOB_FAILED", "data": err.stack || err.toString(), "partialResult": result }, err.reject ? err.requeue : null, err.reject && (err.requeueDelay || options.requeueDelay));
           } else {
-            respond({ "success":true, "data":result });
+            respond({ "success": true, "data": result });
           }
-        });
+        };
+        switch (agentModule.run.length) {
+          case 3:
+            agentModule.run(jobData, jobId, done);
+            break;
+          case 4:
+            agentModule.run(jobData, jobId, jobAt, done);
+            break;
+          default:
+            agentModule.run(jobData, done);
+        }
       } catch (e) {
-        respond({ "error":"RUN_UNCAUGHT_EXCEPTION", "data":e.stack || e.toString() });
+        respond({ "error": "RUN_UNCAUGHT_EXCEPTION", "data": e.stack || e.toString() });
       }
     });
   };
@@ -218,15 +228,25 @@ module.exports = function (jobType, options, fn, dependencies) {
   // When a new job is received
   var onJob = function onJob(job, respond) {
     try {
-      agentModule.validate(job.data, function (err, jobData) {
+      var done = function(err, jobData) {
         if (err) {
-          respond({ "error":"INVALID_JOB", "data":err.stack || err.toString(), "originalJob":job });
+          respond({ "error": "INVALID_JOB", "data": err.stack || err.toString(), "originalJob": job });
         } else {
-          onValidated(jobData, respond);
+          onValidated(jobData, job.jobId, job.at, respond);
         }
-      });
+      };
+      switch (agentModule.validate.length) {
+        case 3:
+          agentModule.validate(job.data, job.jobId, done);
+          break;
+        case 4:
+          agentModule.validate(job.data, job.jobId, job.at, done);
+          break;
+        default:
+          agentModule.validate(job.data, done);
+      }
     } catch (e) {
-      respond({ "error":"VALIDATION_UNCAUGHT_EXCEPTION", "data":e.stack || e.toString(), "originalJob":job });
+      respond({ "error": "VALIDATION_UNCAUGHT_EXCEPTION", "data": e.stack || e.toString(), "originalJob": job });
     }
   };
 
