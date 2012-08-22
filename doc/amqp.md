@@ -88,6 +88,12 @@ function run(jobData, cb) {
 }
 ```
 
+Note that `validate` and `run` can both have 3 distinct signatures, depending on additional information you may need from
+the job:
+* `function (jobData, callback)`
+* `function (jobData, jobId, callback)`
+* `function (jobData, jobId, jobAt, callback)`
+
 Scheduler will handle results:
 
 ```javascript
